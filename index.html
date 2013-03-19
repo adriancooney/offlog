@@ -1,0 +1,75 @@
+<html>
+<head>
+	<title>Offlog - Creating new post</title>
+	<link href='http://fonts.googleapis.com/css?family=Monda:400,700' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Raleway:400,800,700,500,200,300' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="style/reset.css">
+	<link rel="stylesheet" href="style/style.css">
+
+	<script type="text/template" data-id="new-blog">
+		<h1>Hello world!</h1>
+	</script>
+
+	<script type="text/template" data-id="welcome">
+		<div class="banner">
+			<h1>Welcome to Offlog</h1>
+			<h3>A standalone static blog generator in your browser.</h3>
+		</div>
+		<div class="row columns">
+			<div class="third">
+				<h3>About</h3>
+				<p>Offlog is a static blog generator that works entirely within the browser. Offlog uses Chrome's new FileSystem API to compile and generate a static blog. Offlog allows you write blog posts, edit the blog's CSS and templates.</p>
+			</div>
+			<div class="third">
+				<h3>Getting Started</h3>
+				<p>To get started, check out the menu in the top left corner and hit <span class="inline-button"><i class="icon-plus"></i> New Blog</span> to create your first blog. Select your folder path and start writing posts. Happy static blogging!</p>
+			</div>
+			<div class="third">
+				<h3>Contributions</h3>
+				<p>Offlog was coded and put together by one man but wouldnt be possible to look as good without <a href="http://fortawesome.github.com/Font-Awesome/" target="_blank">Font Awesome</a> and <a href="http://subtlepatterns.com" target="_blank">Subtle Patterns</a>, function without <a href="http://codemirror.net/" target="_blank">Code Mirror</a> and exist without Chrome. I could of course do with a hand so feel free to fork <a href="#" target="_blank">Offlog on Github</a>.</p>
+			</div>	
+		</div>
+	</script>
+
+	<script type="text/template" data-id="currentblogbar">
+		<div class="blog-bar">
+			<i id="expand-blog-settings" class="icon-cog"></i>
+			<h3><i class="icon-book type"></i> Adrian Cooney <a href="#open-blog"><i class="icon-external-link"></i></a></h3>
+			<div class="blog-settings"></div>
+		</div>
+	</script>
+
+	<script type="text/template" data-id="new-post" data-partials="currentblogbar">
+		{{>currentblogbar}}
+		<input type="text" placeholder="Post title.." id="new-post-title"/>
+		<textarea id="new-post-content"/></textarea>
+	</script>
+
+	<script type="text/template" data-id="home">
+
+	</script>
+
+	<script type="text/template" data-id="settings">
+
+	</script>
+</head>
+<body>
+	<aside id="sidebar-container" class="small">
+		<header></header>
+		<nav>
+			<li><i class="icon-reorder"></i> Menu</li>
+			<li class="break"><i class="icon-home"></i> Home</li>
+			<li><i class="icon-plus"></i> New Blog</li>
+			<li><i class="icon-cog"></i> Settings</li>
+			<li><i class="icon-medkit"></i> Help</li>
+			<li class="break"><i class="icon-file-alt"></i> New Post</li>
+			<li><i class="icon-hdd"></i> View Drafts</li>
+			<li><i class="icon-tint"></i> Edit Style</li>
+		</nav>
+	</aside>
+	<section id="main-container"></section>
+</body>
+
+<script src="lib/mustache.js"></script>
+<script src="offlog/Offlog-min.js"></script>
+</html>
