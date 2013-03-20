@@ -9,6 +9,15 @@ var Offlog = {
 	sidebar: {
 		buttonHandlers: {
 			"Menu": function() {
+				menuClick = true;
+
+				//And wait
+				setTimeout(function() {
+					menuClick = false;
+
+					if(!hoverIntentStillHovering) Offlog.sidebar.close()
+				}, 2000);
+
 				Offlog.sidebar.toggle();
 			},
 
@@ -16,9 +25,21 @@ var Offlog = {
 				Offlog.renderView("Home");
 			},
 
+			"New Blog": function() {
+				Offlog.renderView("NewBlog");
+			},
+
+			"Settings": function() {
+				Offlog.renderView("Settings");
+			},
+
+			"Help": function() {
+				Offlog.renderView("Help");
+			},
+
 			"New Post": function() {
 				Offlog.renderView("NewPost");
-			}
+			},
 		},
 
 		toggle: function() {
@@ -28,6 +49,8 @@ var Offlog = {
 		},
 
 		close: function() {
+
+	console.log("Menu Click", menuClick)
 			if(!Offlog.containers.sidebar.classList.contains("small")) Offlog.containers.sidebar.classList.add("small");
 		},
 
@@ -49,7 +72,7 @@ var Offlog = {
 		// Correct dimensions
 		this.resize();
 
-		this.renderView("Welcome");
+		this.renderView("NewBlog");
 	},
 
 	registerView: function(view, init, die) {
@@ -131,7 +154,6 @@ Offlog.Template = {
 		Array.prototype.forEach.call(document.querySelectorAll("script[data-id]"), function(e, i) {
 			var id = e.getAttribute("data-id"),
 				partials = (e.getAttribute("data-partials") || "").split(",").map(function(v) { return v.trim(); });
-
 
 			templates[id] = [e.innerText.trim(), partials];
 		});
@@ -224,18 +246,18 @@ Array.prototype.forEach.call(document.querySelectorAll("nav li"), function(elem)
 		//Reset the hover intent
 		hoverIntentListening = false;
 
-		Offlog.sidebar.buttonHandlers[this.innerText.trim()].call(Offlog, elem);
-		Offlog.sidebar.close();
+		console.log(this.children[1].innerText.trim());
+		Offlog.sidebar.buttonHandlers[this.children[1].innerText.trim()].call(Offlog, elem);
+		if(!menuClick) setTimeout(Offlog.sidebar.close, 600);
 	});
 });
 
 // Hover intent to expand menu on hover
-var hoverIntentListening = false, hoverIntentStillHovering = false;
+var hoverIntentListening = false, hoverIntentStillHovering = false, menuClick = false;
 Offlog.containers.sidebar.addEventListener("mouseover", function() {
 	if(!hoverIntentListening && Offlog.sidebar.status() == "closed") {
 		hoverIntentListening = true, hoverIntentStillHovering = true;
 		setTimeout(function() {
-			console.log("Toggling!", hoverIntentStillHovering);
 			if(hoverIntentStillHovering) {
 				Offlog.sidebar.open();
 				hoverIntentListening = false;
@@ -247,7 +269,7 @@ Offlog.containers.sidebar.addEventListener("mouseover", function() {
 Offlog.containers.sidebar.addEventListener("mouseout", function(event) {
 
     function hasParent(child, parent) {
-    	for(var el = child.parentNode; el; el = el.parentNode) { //Pretty cool if I don't say so myself
+    	for(var el = child.parentNode || false; el; el = (el || {}).parentNode) { //Pretty cool if I don't say so myself
     		if(el == parent) return true;
     	}
     }
@@ -261,5 +283,5 @@ Offlog.containers.sidebar.addEventListener("mouseout", function(event) {
 	hoverIntentStillHovering = false;
 
 	//Close it anyway
-	Offlog.sidebar.close();
+	if(!menuClick) Offlog.sidebar.close();
 });

@@ -1,3 +1,3 @@
 Offlog.registerView("Home", function() {
-	Offlog.containers.main.innerHTML = "<h1>Hello world!</h1>";
+	Offlog.Template.render("home", Offlog.containers.main);
 });
