@@ -1,14 +1,10 @@
 <html>
 <head>
 	<title>Offlog - Creating new post</title>
-	<link href='http://fonts.googleapis.com/css?family=Monda:400,700' rel='stylesheet' type='text/css'>
-	<link href='http://fonts.googleapis.com/css?family=Raleway:400,800,700,500,200,300' rel='stylesheet' type='text/css'>
+	<!--<link href='http://fonts.googleapis.com/css?family=Monda:400,700' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Raleway:400,800,700,500,200,300' rel='stylesheet' type='text/css'>-->
 	<link rel="stylesheet" href="style/reset.css">
 	<link rel="stylesheet" href="style/style.css">
-
-	<script type="text/template" data-id="new-blog">
-		<h1>Hello world!</h1>
-	</script>
 
 	<script type="text/template" data-id="welcome">
 		<div class="banner">
@@ -18,7 +14,7 @@
 		<div class="row columns">
 			<div class="third">
 				<h3>About</h3>
-				<p>Offlog is a static blog generator that works entirely within the browser. Offlog uses Chrome's new FileSystem API to compile and generate a static blog. Offlog allows you write blog posts, edit the blog's CSS and templates.</p>
+				<p>Offlog is a static blog generator that works entirely within the browser. Offlog uses Chrome's new FileSystem API to compile and generate a static blog. Offlog allows you write blog posts, edit the blog's CSS and templates right from a handy little extension.</p>
 			</div>
 			<div class="third">
 				<h3>Getting Started</h3>
@@ -46,25 +42,90 @@
 	</script>
 
 	<script type="text/template" data-id="home">
+		<div class="blog-bar">
+			<h3><i class="icon-home type"></i> Home</h3>
+		</div>
+		<div class="row columns">
+			<div class="half">
+				<h3>Available Blogs</h3>
+			</div>
+			<div class="half"></div>
+		</div>
+	</script>
 
+	<script type="text/template" data-id="new-blog">
+		<div class="blog-bar">
+			<h3><i class="icon-plus type"></i> New Blog</h3>
+		</div>
+		<div class="row columns">
+			<div class="half">
+				<form id="create-blog">
+					<h3>Identification</h3>
+					<input type="text" placeholder="Blog Name" name="blog-name" /><br>
+					<textarea placeholder="Description"></textarea>
+					<label>Theme</label><span><select><option value="default">Default</option></select></span>
+					<input type="submit" value="Submit" style="float:right"/>
+					<h3>Meta information</h3>
+					<label>Pagination article threshold</label><input type="number" value="6" name="blog-pagination" />
+				</form>
+			</div>
+			<div class="half">
+				<h3>File Structure</h3>
+				<div class="cabinet"><li class="dir">blog/</li>
+					<div><li>index.html</li>
+						<li class="dir">articles/</li>
+						<div>
+							<li>first-post.html</li>
+							<li>second-post.html</li>
+							<li>third-post.html</li>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</script>
+
+	<script type="text/template" data-id="help">
+		<div class="blog-bar">
+			<h3><i class="icon-medkit type"></i> Help</h3>
+		</div>
 	</script>
 
 	<script type="text/template" data-id="settings">
-
+		<div class="blog-bar">
+			<h3><i class="icon-cog type"></i> Settings</h3>
+		</div>
+		<div class="row columns">
+			<div class="half">
+				<h3>Author</h3>
+				<form id="author">
+					<input type="text" placeholder="Name" name="author-name" /><br>
+					<input type="text" placeholder="Email" name="author-email" />
+					<textarea placeholder="Bio" name="author-bio"></textarea>
+				</form>
+			</div>
+			<div class="half">
+				<h3>Writing</h3>
+				<form id="author">
+					<label>Font Size</label><input type="text" value="16px" name="writing-name" style="width: 10%"/>
+					<label>Font Family</label><input type="text" value="Helvetica" name="writing-name" style="width: 20%"/>
+					<label>Line Height</label><input type="text" value="120%" name="writing-name" style="width: 10%"/><br>
+				</form>
+			</div>
+		</div>
 	</script>
 </head>
 <body>
 	<aside id="sidebar-container" class="small">
-		<header></header>
 		<nav>
-			<li><i class="icon-reorder"></i> Menu</li>
-			<li class="break"><i class="icon-home"></i> Home</li>
-			<li><i class="icon-plus"></i> New Blog</li>
-			<li><i class="icon-cog"></i> Settings</li>
-			<li><i class="icon-medkit"></i> Help</li>
-			<li class="break"><i class="icon-file-alt"></i> New Post</li>
-			<li><i class="icon-hdd"></i> View Drafts</li>
-			<li><i class="icon-tint"></i> Edit Style</li>
+			<li><i class="icon-reorder"></i> <span>Menu</span></li>
+			<li class="break"><i class="icon-home"></i> <span>Home</span></li>
+			<li><i class="icon-plus"></i> <span>New Blog</span></li>
+			<li><i class="icon-cog"></i> <span>Settings</span></li>
+			<li><i class="icon-medkit"></i> <span>Help</span></li>
+			<li class="break"><i class="icon-file-alt"></i> <span>New Post</span></li>
+			<li><i class="icon-inbox"></i> <span>View Drafts</span></li>
+			<li><i class="icon-tint"></i> <span>Edit Style</span></li>
 		</nav>
 	</aside>
 	<section id="main-container"></section>

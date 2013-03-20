@@ -1077,6 +1077,9 @@ body {
   color: transparent;
   width: 20px;
 }
+#sidebar-container.small li span {
+  display: none;
+}
 #sidebar-container.small + section {
   margin-left: 46px;
 }
@@ -1110,9 +1113,10 @@ body {
 }
 #main-container .blog-bar #expand-blog-settings {
   float: right;
-  font-size: 32px;
-  padding: 8px;
+  font-size: 26px;
+  padding: 12px;
   color: #272730;
+  cursor: pointer;
 }
 #main-container .blog-bar .blog-settings {
   opacity: 0;
@@ -1230,6 +1234,54 @@ body {
 .columns span {
   font-family: 'Monda', sans-serif;
 }
+.columns input,
+.columns textarea {
+  width: 95%;
+  border: none;
+  margin: 8px 16px;
+  font-size: 18px;
+  padding: 6px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  outline: none;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+.columns textarea {
+  height: 180px;
+}
+.columns input[type=number] {
+  width: 60px;
+}
+.columns label {
+  margin: 16px;
+  margin-right: 0;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+  padding: 8px;
+  text-transform: uppercase;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.5);
+  background: #f3f3f3;
+}
+.columns label + span {
+  padding: 5px;
+  display: inline-block;
+  margin-top: 8px;
+  background: #fff;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+}
+.columns input[type=submit] {
+  border: none;
+  width: 120px;
+  background: #7099b7;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+.columns label + input {
+  margin-left: 0;
+}
+.columns .small {
+  width: 10%;
+}
 .notification {
   position: fixed;
   right: 12px;
@@ -1260,6 +1312,49 @@ body {
 .notification.active {
   -webkit-transform: none;
   opacity: 1;
+}
+.cabinet {
+  margin: 8px 18px;
+  width: inherit;
+}
+.cabinet .dir {
+  color: #007236;
+}
+.cabinet li {
+  width: auto;
+  text-align: left;
+  padding: 6px;
+  padding-left: 0;
+  padding-bottom: 2px;
+  list-style: none;
+  text-indent: 16px;
+  font-family: monospace;
+  font-size: 18px;
+  color: #003471;
+}
+.cabinet li:before {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 22px;
+  margin-left: -16px;
+  margin-top: -14px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  border-left: 2px solid rgba(0, 0, 0, 0.1);
+}
+.cabinet li:first-child:before {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 10px;
+  margin-left: -16px;
+  margin-top: 0;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  border-left: 2px solid rgba(0, 0, 0, 0.1);
+}
+.cabinet div {
+  margin-left: 20px;
+  width: 100%;
 }
 .transition {
   -webkit-transition: 300ms all;

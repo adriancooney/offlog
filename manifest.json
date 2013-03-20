@@ -1,0 +1,25 @@
+{
+  "name": "Offlog",
+  "description": "A standalone static blog generator in your browser.",
+  "manifest_version": 2,
+  "version": "1.0",
+  "app": {
+    "background": {
+      "scripts": ["background.js"]
+    }
+  },
+
+  "icons": {
+    "16": "icon_16.png",
+    "128": "icon_128.png"
+  },
+
+  "permissions": [
+    "clipboardRead",
+    "clipboardWrite",
+    "unlimitedStorage",
+    {
+      "fileSystem": ["write"]
+    }
+  ]
+}
