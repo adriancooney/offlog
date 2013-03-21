@@ -319,13 +319,20 @@ Offlog.containers.sidebar.addEventListener("mouseout", function(event) {
 });
 
 /* **********************************************
-     Begin NewPost.view.js
+     Begin Help.view.js
 ********************************************** */
 
-Offlog.registerView("NewPost", function() {
-	Offlog.Template.render("new-post", Offlog.containers.main);
+Offlog.registerView("Help", function() {
+	console.log("REndering view Welcome");
+	Offlog.Template.render("help", Offlog.containers.main);
+});
 
-	
+/* **********************************************
+     Begin Home.view.js
+********************************************** */
+
+Offlog.registerView("Home", function() {
+	Offlog.Template.render("home", Offlog.containers.main);
 });
 
 /* **********************************************
@@ -338,11 +345,12 @@ Offlog.registerView("Welcome", function() {
 });
 
 /* **********************************************
-     Begin Home.view.js
+     Begin NewBlog.view.js
 ********************************************** */
 
-Offlog.registerView("Home", function() {
-	Offlog.Template.render("home", Offlog.containers.main);
+Offlog.registerView("NewBlog", function() {
+	console.log("REndering view Welcome");
+	Offlog.Template.render("new-blog", Offlog.containers.main);
 });
 
 /* **********************************************
@@ -355,19 +363,11 @@ Offlog.registerView("Settings", function() {
 });
 
 /* **********************************************
-     Begin NewBlog.view.js
+     Begin NewPost.view.js
 ********************************************** */
 
-Offlog.registerView("NewBlog", function() {
-	console.log("REndering view Welcome");
-	Offlog.Template.render("new-blog", Offlog.containers.main);
-});
+Offlog.registerView("NewPost", function() {
+	Offlog.Template.render("new-post", Offlog.containers.main);
 
-/* **********************************************
-     Begin Help.view.js
-********************************************** */
-
-Offlog.registerView("Help", function() {
-	console.log("REndering view Welcome");
-	Offlog.Template.render("help", Offlog.containers.main);
+	
 });
