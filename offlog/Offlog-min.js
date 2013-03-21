@@ -40,6 +40,10 @@ var Offlog = {
 			"New Post": function() {
 				Offlog.renderView("NewPost");
 			},
+
+			"Edit Theme": function() {
+				Offlog.renderView("EditTheme");
+			},
 		},
 
 		toggle: function() {
@@ -49,8 +53,6 @@ var Offlog = {
 		},
 
 		close: function() {
-
-	console.log("Menu Click", menuClick)
 			if(!Offlog.containers.sidebar.classList.contains("small")) Offlog.containers.sidebar.classList.add("small");
 		},
 
@@ -72,7 +74,7 @@ var Offlog = {
 		// Correct dimensions
 		this.resize();
 
-		this.renderView("NewBlog");
+		this.renderView("EditTheme");
 	},
 
 	registerView: function(view, init, die) {
@@ -83,7 +85,7 @@ var Offlog = {
 		var that = this;
 		if(!this.views[view]) console.log("View '" + view + "' not found.");
 		else {
-			if(this.currentView) this.views[this.currentView].transition("fadeTop", "out", function() {
+			if(this.currentView) this.views[this.currentView].die(), this.views[this.currentView].transition("fadeTop", "out", function() {
 				that.views[view].render();
 				that.views[view].transition("fadeTop", "in", function() {
 					that.currentView = view;
@@ -101,13 +103,19 @@ var Offlog = {
  */
 Offlog.View = function(name, init, die) {
 	this.name = name;
-	this.init = init;
-	this.die = die;
+	this._init = init;
+	this._die = die || function() {};
 	this.events = [];
 };
 
 Offlog.View.prototype.render = function() {
-	this.init.call(this);
+	this._init.call(this);
+	this._bindEvents();
+};
+
+Offlog.View.prototype.die = function() {
+	this._die.call(this);
+	this._unbindEvents();
 };
 
 Offlog.View.prototype.addEventListener = function(elem, event, fn) {
@@ -115,13 +123,14 @@ Offlog.View.prototype.addEventListener = function(elem, event, fn) {
 };
 
 Offlog.View.prototype._bindEvents = function() {
-	this.event.forEach(function(eventObj) {
+	console.log("Binding events.");
+	this.events.forEach(function(eventObj) {
 		eventObj[0].addEventListener(eventObj[1], eventObj[2]);
 	});
 };
 
 Offlog.View.prototype._unbindEvents = function() {
-	this.event.forEach(function(eventObj) {
+	this.events.forEach(function(eventObj) {
 		eventObj[0].removeEventListener(eventObj[1], eventObj[2]);
 	});
 };
@@ -319,13 +328,44 @@ Offlog.containers.sidebar.addEventListener("mouseout", function(event) {
 });
 
 /* **********************************************
-     Begin NewPost.view.js
+     Begin EditTheme.view.js
 ********************************************** */
 
-Offlog.registerView("NewPost", function() {
-	Offlog.Template.render("new-post", Offlog.containers.main);
+Offlog.registerView("EditTheme", function() {
+	Offlog.Template.render("edit-theme", Offlog.containers.main);
 
-	
+	var cm = document.getElementById("codemirror");
+
+	var myCodeMirror = CodeMirror(cm, {
+		value: "function myScript(){return 100;}\n",
+		mode: "javascript",
+		lineNumbers: "true",
+		theme: "elegant"
+	});
+
+	//And resize
+	cm.children[0].style.height = (window.innerHeight - 47) + "px";
+
+	this.addEventListener(window, "resize", function() {
+		cm.children[0].style.height = (window.innerHeight - 47) + "px";
+	})
+});
+
+/* **********************************************
+     Begin Help.view.js
+********************************************** */
+
+Offlog.registerView("Help", function() {
+	console.log("REndering view Welcome");
+	Offlog.Template.render("help", Offlog.containers.main);
+});
+
+/* **********************************************
+     Begin Home.view.js
+********************************************** */
+
+Offlog.registerView("Home", function() {
+	Offlog.Template.render("home", Offlog.containers.main);
 });
 
 /* **********************************************
@@ -338,23 +378,6 @@ Offlog.registerView("Welcome", function() {
 });
 
 /* **********************************************
-     Begin Home.view.js
-********************************************** */
-
-Offlog.registerView("Home", function() {
-	Offlog.Template.render("home", Offlog.containers.main);
-});
-
-/* **********************************************
-     Begin Settings.view.js
-********************************************** */
-
-Offlog.registerView("Settings", function() {
-	console.log("REndering view Welcome");
-	Offlog.Template.render("settings", Offlog.containers.main);
-});
-
-/* **********************************************
      Begin NewBlog.view.js
 ********************************************** */
 
@@ -364,10 +387,23 @@ Offlog.registerView("NewBlog", function() {
 });
 
 /* **********************************************
-     Begin Help.view.js
+     Begin Settings.view.js
 ********************************************** */
 
-Offlog.registerView("Help", function() {
-	console.log("REndering view Welcome");
-	Offlog.Template.render("help", Offlog.containers.main);
+Offlog.registerView("Settings", function() {
+	Offlog.Template.render("settings", Offlog.containers.main);
+
+	this.addEventListener(document.getElementById("github"), "click", function() {
+		window.open("https://github.com/login/oauth/authorize?client_id=2143ac0ba460d74d319d", "Google.com", "height=500,width=500");
+	})
+});
+
+/* **********************************************
+     Begin NewPost.view.js
+********************************************** */
+
+Offlog.registerView("NewPost", function() {
+	Offlog.Template.render("new-post", Offlog.containers.main);
+
+	
 });
