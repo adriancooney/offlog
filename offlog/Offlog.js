@@ -74,7 +74,7 @@ var Offlog = {
 		// Correct dimensions
 		this.resize();
 
-		this.renderView("EditTheme");
+		this.renderView("Welcome");
 	},
 
 	registerView: function(view, init, die) {
