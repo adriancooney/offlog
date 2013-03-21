@@ -40,6 +40,10 @@ var Offlog = {
 			"New Post": function() {
 				Offlog.renderView("NewPost");
 			},
+
+			"Edit Theme": function() {
+				Offlog.renderView("EditTheme");
+			},
 		},
 
 		toggle: function() {
@@ -49,8 +53,6 @@ var Offlog = {
 		},
 
 		close: function() {
-
-	console.log("Menu Click", menuClick)
 			if(!Offlog.containers.sidebar.classList.contains("small")) Offlog.containers.sidebar.classList.add("small");
 		},
 
@@ -72,7 +74,7 @@ var Offlog = {
 		// Correct dimensions
 		this.resize();
 
-		this.renderView("NewBlog");
+		this.renderView("Welcome");
 	},
 
 	registerView: function(view, init, die) {
@@ -83,7 +85,7 @@ var Offlog = {
 		var that = this;
 		if(!this.views[view]) console.log("View '" + view + "' not found.");
 		else {
-			if(this.currentView) this.views[this.currentView].transition("fadeTop", "out", function() {
+			if(this.currentView) this.views[this.currentView].die(), this.views[this.currentView].transition("fadeTop", "out", function() {
 				that.views[view].render();
 				that.views[view].transition("fadeTop", "in", function() {
 					that.currentView = view;
@@ -101,13 +103,19 @@ var Offlog = {
  */
 Offlog.View = function(name, init, die) {
 	this.name = name;
-	this.init = init;
-	this.die = die;
+	this._init = init;
+	this._die = die || function() {};
 	this.events = [];
 };
 
 Offlog.View.prototype.render = function() {
-	this.init.call(this);
+	this._init.call(this);
+	this._bindEvents();
+};
+
+Offlog.View.prototype.die = function() {
+	this._die.call(this);
+	this._unbindEvents();
 };
 
 Offlog.View.prototype.addEventListener = function(elem, event, fn) {
@@ -115,13 +123,14 @@ Offlog.View.prototype.addEventListener = function(elem, event, fn) {
 };
 
 Offlog.View.prototype._bindEvents = function() {
-	this.event.forEach(function(eventObj) {
+	console.log("Binding events.");
+	this.events.forEach(function(eventObj) {
 		eventObj[0].addEventListener(eventObj[1], eventObj[2]);
 	});
 };
 
 Offlog.View.prototype._unbindEvents = function() {
-	this.event.forEach(function(eventObj) {
+	this.events.forEach(function(eventObj) {
 		eventObj[0].removeEventListener(eventObj[1], eventObj[2]);
 	});
 };
