@@ -55,6 +55,22 @@
 		</div>
 	</script>
 
+	<script type="text/template" data-id="github-login">
+		<section id="github-login">
+			<h3><i class="icon-github"></i>Sign in</h3>
+			<label>Username</label>
+			<input type="text" id="login-username"/>
+			<label>Password</label>
+			<input type="password" id="login-password"/><br>
+			<input type="submit" id="submit-login" value="Submit" /><span class="spinner inactive" id="load"></span>
+			<input type="submit" id="cancel-login" value="Cancel" />
+		</section>
+		<aside class="alert">
+			<i class="icon-bullhorn"></i>
+			<p>This is a <em>standalone application</em>. No outside calls are made to anywhere other than to Github. Your <em>credentials are safe</em> here.</p>
+		</aside>
+	</script>
+
 	<script type="text/template" data-id="drafts">
 		<div class="blog-bar">
 			<h3><i class="icon-inbox type"></i> Drafts</h3>
@@ -168,12 +184,20 @@
 			<li><i class="icon-inbox"></i> <span>View Drafts</span></li>
 			<li><i class="icon-tint"></i> <span>Edit Theme</span></li>
 		</nav>
+		<div class="logo">
+			<span class="spinner black"></span>
+		</div>
 	</aside>
 	<section id="main-container"></section>
 </body>
 
 <script src="lib/mustache.js"></script>
 <script src="lib/codemirror.js"></script>
-<script src="offlog/Github.js"></script>
+
+<!-- Github Integration Library, frustrating that is has such large dependancies -->
+<script src="lib/github/lib/underscore-min.js"></script>
+<script src="lib/github/lib/base64.js"></script>
+<script src="lib/github/github.js"></script>
+
 <script src="offlog/Offlog-min.js"></script>
 </html>

@@ -95,7 +95,7 @@ var Offlog = {
 		// Correct dimensions
 		this.resize();
 
-		this.renderView("Drafts");
+		this.renderView("Settings");
 	},
 
 	registerView: function(view, init, die) {
@@ -144,9 +144,11 @@ Offlog.View.prototype.addEventListener = function(elem, event, fn) {
 };
 
 Offlog.View.prototype._bindEvents = function() {
-	console.log("Binding events.");
+	var that = this;
 	this.events.forEach(function(eventObj) {
-		eventObj[0].addEventListener(eventObj[1], eventObj[2]);
+		eventObj[0].addEventListener(eventObj[1], function() {
+			eventObj[2].call(that)
+		});
 	});
 };
 
@@ -170,6 +172,65 @@ Offlog.View.prototype.transition = function(transition, inOrOut, callback) {
 			Offlog.containers.main.classList.remove(transition);
 			setTimeout(callback, 300);
 		}, 50);
+	}
+};
+
+/**
+ * Offlog localStorage API. Simple stuff
+ * @type {Object}
+ */
+Offlog.Storage = {
+	"set": function(name, val) {
+		window.localStorage.setItem(name, JSON.stringify(val));
+	},
+
+	"get": function(name) {
+		if(this.exists(name)) {
+
+			return JSON.parse(window.localStorage.getItem(name));
+
+		} else throw new Error("Key does not exist");
+	},
+
+	exists: function(name) {
+		return !!window.localStorage.key(name);
+	}
+};
+
+Offlog.config = function(name, val) {
+	name = "config_" + name;
+
+	if(name && val) return Offlog.Storage.set(name, val);
+	else return Offlog.Storage.get(name);
+};
+
+Offlog.Github = {
+	auth: "basic",
+
+	testCredentials: function(username, pw, callback) {
+		var gb = new Github({
+			username: username,
+			password: pw,
+			auth: Offlog.Github.auth
+		}).getUser().show(username, this.callback(function(user) {
+			callback(true);
+		}, function(e) {
+			if(e.error == 403 || e.error == 401) callback(false);
+		}));
+	},
+
+	callback: function(clbk, error) {
+		// Slick error handling baby, wildcard or manual
+		var that = this;
+		return function() {
+			var args = Array.prototype.slice.call(arguments);
+			if(args[0]) error ? error(args[0]) : that.error(args[0]);
+			else clbk(args.slice(1));
+		}
+	},
+
+	error: function(e) {
+
 	}
 };
 
@@ -219,17 +280,22 @@ Offlog.Template = {
  * @param {integer} die    Length of time before notification fades
  */		
 Offlog.Notification = function(type, title, content, die) {
-	this.type = type || "error";
+	this.type = type || "notification";
 	this.title = title || "Notification";
 	this.content = content;
 	this.die = die || 3000;
+	this.icons = {
+		"success": "ok",
+		"error": "remove",
+		"notification": "bolt"
+	}
 
 	var elem = this.elem = document.createElement("figure");
 
 	elem.classList.add("notification");
 	elem.classList.add(type);
 
-	elem.innerHTML = "<i class=\"icon-remove-sign close\"></i><h3>" + this.title + "</h3><p>" + this.content + "</p>";
+	elem.innerHTML = "<i class=\"icon-remove-sign close\"></i><i class=\"icon-" + this.icons[type] + " type\"></i><h3>" + this.title + "</h3><p>" + this.content + "</p>";
 
 	//Compensate for the possibilites of other notifications
 	elem.style.bottom = ((document.querySelectorAll(".notification").length * (46 + 12)) + 12) + "px";
@@ -266,6 +332,40 @@ Offlog.Notification.prototype.fadeOut = function() {
 	setTimeout(function() {
 		document.body.removeChild(that.elem);
 	}, 300);
+};
+
+Offlog.Modal = function(content, width, height) {
+	width = width || 400;
+	height = height || 320;
+
+	this.overlay = document.createElement("div");
+	this.overlay.classList.add("modal");
+
+	this.overlay.style.height = window.innerHeight + "px";
+
+	var modal = document.createElement("div"),
+		iframe = document.createElement("iframe");
+
+	modal.style.height = height + "px";
+	modal.style.width = width + "px";
+
+	this.overlay.appendChild(modal);
+	modal.innerHTML = content;
+	document.body.insertBefore(this.overlay, document.body.children[0]);
+
+	modal.style.marginTop = ((window.innerHeight/2) - (height/2)) + "px";
+
+	// Bind the onresize event
+	var that = this;
+	window.addEventListener("resize", function() {
+		that.overlay.style.height = window.innerHeight + "px";
+		modal.style.marginTop = ((window.innerHeight/2) - (height/2)) + "px";
+	});
+
+};
+
+Offlog.Modal.prototype.die = function() {
+	document.body.removeChild(this.overlay);
 };
 
 Offlog.Filesystem = {
@@ -420,8 +520,52 @@ Offlog.registerView("Settings", function() {
 	Offlog.Template.render("settings", Offlog.containers.main);
 
 	this.addEventListener(document.getElementById("github"), "click", function() {
-		window.open("https://github.com/login/oauth/authorize?client_id=2143ac0ba460d74d319d", "Google.com", "height=500,width=500");
-	})
+		console.log(this);
+		var modal = new Offlog.Modal(Mustache.render(Offlog.Template.templates["github-login"][0]), 400, 340);
+
+		// Bind the events to the buttons
+		document.getElementById("cancel-login").addEventListener("click", function() {
+			modal.die();
+		});
+
+		document.getElementById("submit-login").addEventListener("click", function() {
+
+			var username = document.getElementById("login-username").value,
+				password = document.getElementById("login-password").value;
+
+			if(username && password) {
+				showLoader();
+
+				Offlog.Github.testCredentials(username, password, function(valid) {
+					hideLoader();
+
+					if(valid) {
+						new Offlog.Notification("success", "Valid Credentials", "Your Github credentials are valid.");
+						modal.die();
+
+						//And set the interface
+						Offlog.Github.api(username, password);
+
+						showUserInformation();
+					} else new Offlog.Notification("error", "Invalid Credentials", "Please provide valid Github credentials.");
+				})
+			} else {
+				new Offlog.Notification("error", "Credentials", "Please provide a username and password.")
+			}
+		});
+
+		function showLoader() {
+			document.getElementById("load").classList.remove("inactive");
+		}
+
+		function hideLoader() {
+			document.getElementById("load").classList.add("inactive");
+		}
+	});
+
+	function showUserInformation() {
+
+	}
 });
 
 /* **********************************************
