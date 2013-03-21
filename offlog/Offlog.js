@@ -44,6 +44,10 @@ var Offlog = {
 			"Edit Theme": function() {
 				Offlog.renderView("EditTheme");
 			},
+
+			"View Drafts": function() {
+				Offlog.renderView("Drafts");
+			},
 		},
 
 		toggle: function() {
@@ -66,6 +70,23 @@ var Offlog = {
 		}
 	},
 
+	main: {
+		/**
+		 * Resize elements to full screen minus top bar
+		 * @param  {object} ctx  View context
+		 * @param  {object} e    Element to resize
+		 * @param  {int} 	incr More or less removed/added
+		 */
+		resizeElement: function(ctx, e, incr) {
+			//And resize
+			e.style.height = (window.innerHeight - (47 + (incr || 0))) + "px";
+
+			ctx.addEventListener(window, "resize", function() {
+				e.style.height = (window.innerHeight - (47 + (incr || 0))) + "px";
+			});
+		}
+	},
+
 	resize: function() {
 		document.body.style.height = window.innerHeight + "px";
 	},
@@ -74,7 +95,7 @@ var Offlog = {
 		// Correct dimensions
 		this.resize();
 
-		this.renderView("Welcome");
+		this.renderView("Drafts");
 	},
 
 	registerView: function(view, init, die) {

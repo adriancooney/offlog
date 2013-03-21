@@ -44,6 +44,10 @@ var Offlog = {
 			"Edit Theme": function() {
 				Offlog.renderView("EditTheme");
 			},
+
+			"View Drafts": function() {
+				Offlog.renderView("Drafts");
+			},
 		},
 
 		toggle: function() {
@@ -66,6 +70,23 @@ var Offlog = {
 		}
 	},
 
+	main: {
+		/**
+		 * Resize elements to full screen minus top bar
+		 * @param  {object} ctx  View context
+		 * @param  {object} e    Element to resize
+		 * @param  {int} 	incr More or less removed/added
+		 */
+		resizeElement: function(ctx, e, incr) {
+			//And resize
+			e.style.height = (window.innerHeight - (47 + (incr || 0))) + "px";
+
+			ctx.addEventListener(window, "resize", function() {
+				e.style.height = (window.innerHeight - (47 + (incr || 0))) + "px";
+			});
+		}
+	},
+
 	resize: function() {
 		document.body.style.height = window.innerHeight + "px";
 	},
@@ -74,7 +95,7 @@ var Offlog = {
 		// Correct dimensions
 		this.resize();
 
-		this.renderView("Welcome");
+		this.renderView("Drafts");
 	},
 
 	registerView: function(view, init, die) {
@@ -328,6 +349,42 @@ Offlog.containers.sidebar.addEventListener("mouseout", function(event) {
 });
 
 /* **********************************************
+     Begin Help.view.js
+********************************************** */
+
+Offlog.registerView("Help", function() {
+	console.log("REndering view Welcome");
+	Offlog.Template.render("help", Offlog.containers.main);
+});
+
+/* **********************************************
+     Begin Drafts.view.js
+********************************************** */
+
+Offlog.registerView("Drafts", function() {
+	Offlog.Template.render("drafts", Offlog.containers.main);
+
+	Offlog.main.resizeElement(this, document.querySelectorAll(".preview")[0]);
+});
+
+/* **********************************************
+     Begin Home.view.js
+********************************************** */
+
+Offlog.registerView("Home", function() {
+	Offlog.Template.render("home", Offlog.containers.main);
+});
+
+/* **********************************************
+     Begin Welcome.view.js
+********************************************** */
+
+Offlog.registerView("Welcome", function() {
+	console.log("REndering view Welcome");
+	Offlog.Template.render("welcome", Offlog.containers.main);
+});
+
+/* **********************************************
      Begin EditTheme.view.js
 ********************************************** */
 
@@ -343,21 +400,7 @@ Offlog.registerView("EditTheme", function() {
 		theme: "elegant"
 	});
 
-	//And resize
-	cm.children[0].style.height = (window.innerHeight - 47) + "px";
-
-	this.addEventListener(window, "resize", function() {
-		cm.children[0].style.height = (window.innerHeight - 47) + "px";
-	})
-});
-
-/* **********************************************
-     Begin Help.view.js
-********************************************** */
-
-Offlog.registerView("Help", function() {
-	console.log("REndering view Welcome");
-	Offlog.Template.render("help", Offlog.containers.main);
+	Offlog.main.resizeElement(this, cm.children[0]);
 });
 
 /* **********************************************
@@ -368,22 +411,6 @@ Offlog.registerView("NewBlog", function() {
 	console.log("REndering view Welcome");
 	Offlog.Template.render("new-blog", Offlog.containers.main);
 });
-
-/* **********************************************
-     Begin Welcome.view.js
-********************************************** */
-
-Offlog.registerView("Welcome", function() {
-	console.log("REndering view Welcome");
-	Offlog.Template.render("welcome", Offlog.containers.main);
-});
-
-/* **********************************************
-     Begin NewPost.view.js
-********************************************** */
-
-Offlog.registerView("NewPost", function() {
-	Offlog.Template.render("new-post", Offlog.containers.main);
 
 /* **********************************************
      Begin Settings.view.js

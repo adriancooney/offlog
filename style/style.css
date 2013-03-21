@@ -1274,6 +1274,84 @@ body {
   margin-top: 20px;
   color: #9e0b0f;
 }
+#main-container[data-template="drafts"] .preview {
+  background: #fff;
+  height: 100%;
+  overflow-y: scroll;
+}
+#main-container[data-template="drafts"] .drafts-list li {
+  -webkit-transition: all 300ms;
+  margin: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  padding: 6px 0;
+  cursor: pointer;
+}
+#main-container[data-template="drafts"] .drafts-list li .draft-icon {
+  float: left;
+  font-size: 46px;
+  width: 40px;
+  margin-right: 8px;
+  color: rgba(0, 0, 0, 0.2);
+}
+#main-container[data-template="drafts"] .drafts-list li .arrow {
+  float: right;
+  font-size: 20px;
+  margin-top: 9px;
+  color: rgba(0, 0, 0, 0.4);
+}
+#main-container[data-template="drafts"] .drafts-list li h4 {
+  font-size: 24px;
+  color: rgba(0, 0, 0, 0.6);
+  -webkit-transition: color 300ms;
+}
+#main-container[data-template="drafts"] .drafts-list li h5 {
+  font-size: 14px;
+  margin: 4px;
+  color: rgba(0, 0, 0, 0.3);
+  -webkit-transition: color 300ms;
+}
+#main-container[data-template="drafts"] .drafts-list li:last-child {
+  border-bottom: none;
+}
+#main-container[data-template="drafts"] .drafts-list li:hover h4 {
+  color: #000000;
+}
+#main-container[data-template="drafts"] .drafts-list li:hover h5 {
+  color: rgba(0, 0, 0, 0.6);
+}
+#main-container[data-template="drafts"] .drafts-list .active h4 {
+  color: #000000;
+  font-weight: 600;
+}
+#main-container[data-template="drafts"] .drafts-list .active h5 {
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 600;
+}
+#main-container[data-template="drafts"] .drafts-list .active .draft-icon {
+  color: rgba(0, 0, 0, 0.35);
+}
+#main-container[data-template="drafts"] .drafts-list .active .arrow {
+  margin-right: -4px;
+}
+#main-container[data-template="drafts"] .toolbar {
+  width: 100%;
+  background: #272731;
+}
+#main-container[data-template="drafts"] .toolbar button {
+  font-size: 14px;
+  width: auto;
+  margin: 8px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #dadfe3;
+  background: none;
+  border-right: 1px solid #8d8d96;
+  margin-right: 0;
+  padding-right: 8px;
+}
+#main-container[data-template="drafts"] .toolbar button:last-child {
+  border-right: none;
+  margin-left: 0;
+}
 .row div {
   display: inline-block;
   float: left;
@@ -1344,7 +1422,8 @@ body {
   background: #fff;
   border-bottom: 2px solid rgba(0, 0, 0, 0.05);
 }
-.columns input[type=submit] {
+.columns input[type=submit],
+.columns button {
   border: none;
   width: 120px;
   background: #7099b7;

@@ -10,10 +10,5 @@ Offlog.registerView("EditTheme", function() {
 		theme: "elegant"
 	});
 
-	//And resize
-	cm.children[0].style.height = (window.innerHeight - 47) + "px";
-
-	this.addEventListener(window, "resize", function() {
-		cm.children[0].style.height = (window.innerHeight - 47) + "px";
-	})
+	Offlog.main.resizeElement(this, cm.children[0]);
 });
