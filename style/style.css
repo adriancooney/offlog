@@ -1121,13 +1121,6 @@ body {
   color: #325670;
   font-size: 80%;
 }
-#main-container .blog-bar #expand-blog-settings {
-  float: right;
-  font-size: 26px;
-  padding: 12px;
-  color: #272730;
-  cursor: pointer;
-}
 #main-container .blog-bar .blog-settings {
   opacity: 0;
   -webkit-transition: opacity 300ms;
@@ -1139,6 +1132,16 @@ body {
   background: #55748b;
   height: 258px;
   opacity: 1;
+}
+*[alt]:hover:after {
+  content: attr(alt);
+  position: absolute;
+  background: rgba(0, 0, 0, 0.8);
+  font-size: 12px;
+  color: #fff;
+  padding: 4px;
+  margin-top: 28px;
+  margin-left: -50px;
 }
 #main-container[data-template="welcome"] .banner {
   background: url(../assets/img/cartographer.png) #6390b1;
@@ -1183,6 +1186,22 @@ body {
   font-family: monospace;
   color: #58586b;
   line-height: 140%;
+}
+#main-container[data-template="new-post"] .controls {
+  float: right;
+  padding: 10px;
+  padding-right: 0;
+}
+#main-container[data-template="new-post"] .controls i {
+  height: 20px;
+  padding: 4px 12px;
+  font-size: 22px;
+  color: #272730;
+  cursor: pointer;
+}
+#main-container[data-template="new-post"] .controls i:first-child {
+  border-right: 1px solid rgba(0, 0, 0, 0.3);
+  font-size: 26px;
 }
 #main-container[data-template="new-post"] .post-controls {
   float: right;
@@ -1310,6 +1329,21 @@ body {
 #main-container[data-template="settings"] input[type=text] {
   width: 80%;
 }
+#main-container[data-template="home"] .scroll-wrapper {
+  overflow-y: scroll;
+}
+#main-container[data-template="home"] .no-blogs h4 {
+  font-size: 28px;
+  font-weight: bold;
+  text-align: center;
+  margin: 30px;
+  width: 100%;
+}
+#main-container[data-template="home"] .no-blogs p {
+  font-size: 14px;
+  text-align: center;
+  width: 100%;
+}
 #main-container[data-template="home"] article {
   height: 160px;
   margin: 16px;
@@ -1321,6 +1355,9 @@ body {
   font-size: 28px;
   font-weight: bold;
   margin-bottom: 8px;
+}
+#main-container[data-template="home"] article .full {
+  width: 100%;
 }
 #main-container[data-template="home"] article .des,
 #main-container[data-template="home"] article .stats {
@@ -1351,7 +1388,7 @@ body {
 }
 #main-container[data-template="home"] article .stats li span {
   font-weight: bold;
-  color: #9e9ec0;
+  color: #6e98b6;
 }
 #main-container[data-template="home"] article .actions {
   float: right;
@@ -1365,15 +1402,46 @@ body {
 #main-container[data-template="home"] article .actions i:nth-child(3) {
   font-size: 22px;
 }
-#main-container[data-template="home"] article .actions i:hover:after {
-  content: attr(alt);
-  position: absolute;
-  background: rgba(0, 0, 0, 0.8);
-  font-size: 12px;
+#main-container[data-template="home"] #console {
+  background: #272730;
+  margin: 8px 16px;
+  width: 95.5%;
+  height: 280px;
+  border-radius: 8px;
+  padding-top: 8px;
+  overflow-y: scroll;
+}
+#main-container[data-template="home"] #console p {
+  color: green;
+  font-family: monospace;
+  color: #1ca51e;
+  font-size: 16px;
+  margin: 0 12px 0;
+  padding: 0;
+}
+#main-container[data-template="home"] #console p:before {
+  content: '$ ';
+  color: #25da2a;
+}
+#main-container[data-template="home"] #console p:last-child:after {
+  content: ' \2588';
   color: #fff;
-  padding: 4px;
-  margin-top: 28px;
-  margin-left: -50px;
+  font-size: 96%;
+  -webkit-animation: blink 1000ms infinite;
+}
+@-webkit-keyframes blink {
+  0% {
+    color: #272730;
+  }
+  49% {
+    color: #272730;
+  }
+  50% {
+    color: #fff;
+  }
+  100% {
+    color: #fff;
+  }
 }
 #main-container[data-template="drafts"] .preview {
   background: #fff;
@@ -1411,6 +1479,9 @@ body {
   color: rgba(0, 0, 0, 0.3);
   -webkit-transition: color 300ms;
 }
+#main-container[data-template="drafts"] .drafts-list li h5 span {
+  font-weight: bold;
+}
 #main-container[data-template="drafts"] .drafts-list li:last-child {
   border-bottom: none;
 }
@@ -1426,7 +1497,6 @@ body {
 }
 #main-container[data-template="drafts"] .drafts-list .active h5 {
   color: rgba(0, 0, 0, 0.6);
-  font-weight: 600;
 }
 #main-container[data-template="drafts"] .drafts-list .active .draft-icon {
   color: rgba(0, 0, 0, 0.35);
@@ -1524,6 +1594,7 @@ body {
   border-bottom: 2px solid rgba(0, 0, 0, 0.05);
 }
 .columns input[type=submit],
+.columns input[type=button],
 .columns button {
   border: none;
   width: 120px;

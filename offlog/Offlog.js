@@ -284,10 +284,7 @@ Offlog.Github = {
 		Offlog.Github.getUser(Offlog.config("gh_username"), function(user) {
 			user = user[0];
 
-			Offlog.config("author_name", user.name);
-			Offlog.config("author_email", user.email);
-			Offlog.config("author_bio", user.bio);
-			Offlog.config("author_avatar", user.avatar);
+			Offlog.config("author", user);
 
 			clbk();
 		});
@@ -431,6 +428,24 @@ Offlog.Modal.prototype.die = function() {
 	document.body.removeChild(this.overlay);
 };
 
+Offlog.Console = {
+	append: function(data) {
+		var console = document.getElementById("console");
+
+		var p = document.createElement("p");
+		p.innerText = data;
+
+		console.appendChild(p);
+
+		//http://stackoverflow.com/questions/270612/scroll-to-bottom-of-div
+		console.scrollTop = console.scrollHeight;
+	},
+
+	clear: function() {
+		document.getElementById("console").innerHTML = "";
+	}
+}
+
 Offlog.Filesystem = {
 	fs: (function() {
 		webkitStorageInfo.requestQuota(window.PERSISTENT, 1024 * 1024, function(availableBytes) {
@@ -469,9 +484,11 @@ Offlog.Filesystem = {
 Offlog.Blog = function(options) {
 	this.blog = (function(merge) {
 		var defaults = {
+			id: (Offlog.config("blogs") || []).length + 1,
 			theme: "default",
-			articles: []
-		}, required = ["title", "description", "user"];
+			articles: [],
+			timestamp: new Date().toString()
+		}, required = ["title", "root_location"];
 
 		required.forEach(function(req) { if(!merge[req]) { throw new Error(req + " not supplied to new blog."); }});
 		for(var key in defaults) if(!merge[key]) merge[key] = defaults[key];

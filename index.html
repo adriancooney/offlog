@@ -29,16 +29,16 @@
 		</div>
 	</script>
 
-	<script type="text/template" data-id="currentblogbar">
+	<script type="text/template" data-id="new-post">
 		<div class="blog-bar">
-			<i id="expand-blog-settings" class="icon-cog"></i>
-			<h3><i class="icon-book type"></i> Adrian Cooney <a href="#open-blog"><i class="icon-external-link"></i></a></h3>
+			<div class="controls"><i id="expand-blog-settings" class="icon-cog" alt="Show post settings"></i><i id="post-save" class="icon-save" alt="Save post as draft"></i><i id="post-publish" class="icon-signout" alt="Publish post"></i></div>
+			<h3><i class="icon-book type" alt="Current blog context"></i> {{blog_context}} 
+				{{#has_many_blogs}}
+					<i class="icon-caret-down"></i>
+				{{/has_many_blogs}}
+			</h3>
 			<div class="blog-settings"></div>
 		</div>
-	</script>
-
-	<script type="text/template" data-id="new-post" data-partials="currentblogbar">
-		{{>currentblogbar}}
 		<input type="text" placeholder="Post title.." id="new-post-title"/>
 		<textarea id="new-post-content"/></textarea>
 	</script>
@@ -48,8 +48,9 @@
 			<h3><i class="icon-home type"></i> Home</h3>
 		</div>
 		<div class="row columns">
-			<div class="half">
+			<div class="half scroll-wrapper">
 				<h3>Available Blogs</h3>
+				{{#blogs}}
 				<article>
 					<div class="actions">
 						<i class="icon-cog" alt="Edit Blog Settings"></i>
@@ -57,24 +58,36 @@
 						<i class="icon-external-link" alt="Open Blog"></i>
 						<i class="icon-signout" alt="Publish Blog To Github"></i>
 					</div>
-					<h2>My Blog</h2>
-					<div class="rows columns">
+					<h2>{{title}}</h2>
+					<div class="rows columns full">
 						<div class="half des">
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium voluptas autem laborum maxime expedita possimus accusamus assumenda totam. Cum magnam facere nemo eveniet molestiae harum assumenda quos laudantium excepturi iure?</p>
+							<p>{{description_formatted}}</p>
 						</div>
 						<div class="half stats">
 							<ul>
-								<li><span>Created:</span> <em>5/3/13</em></li>
-								<li><span>Articles:</span> <em>0</em></li>
-								<li><span>Theme:</span> <em>Default</em></li>
-								<li><span>Drafts:</span> <em>1</em></li>
-								<li><span>Root:</span> <em class="mono">blog/</em></li>
+								<li><span>Created:</span> <em>{{date}}</em></li>
+								<li><span>Articles:</span> <em>{{article_count}}</em></li>
+								<li><span>Theme:</span> <em>{{theme}}</em></li>
+								<li><span>Drafts:</span> <em>{{draft_count}}</em></li>
+								<li><span>Root:</span> <em class="mono">{{root_location}}</em></li>
 							</ul>
 						</div>
 					</div>
 				</article>
+				{{/blogs}}
+
+				{{#blogs_empty}}
+					<div class="no-blogs">
+						<h4>No blogs to show!</h4>
+						<p>To get started, hit <span class="inline-button"><i class="icon-plus"></i> New Blog</span> in the sidebar to create a new blog. Happy blogging!</p>
+					</div>
+				{{/blogs_empty}}
 			</div>
-			<div class="half"></div>
+			<div class="half">
+				<h3>Publishing Console</h3>
+				<div id="console">
+				</div>
+			</div>
 		</div>
 	</script>
 
@@ -124,12 +137,12 @@
 			<div class="half">
 				<form id="create-blog">
 					<h3>Identification</h3>
-					<input type="text" placeholder="Blog Name" name="blog-name" /><br>
-					<textarea placeholder="Description"></textarea>
-					<input type="text" placeholder="Root Location (/blog)" style="width:26%;margin-right: 0"/><label>Theme</label><span><select><option value="default">Default</option></select></span>
-					<input type="submit" value="Submit" style="float:right"/>
-					<h3>Meta information</h3>
-					<label>Pagination article threshold</label><input type="number" value="6" name="blog-pagination" />
+					<input type="text" name="name" placeholder="Blog Name" name="blog-name" /><br>
+					<textarea name="description" placeholder="Description"></textarea>
+					<input type="text" placeholder="Root Location (/blog)" style="width:26%;margin-right: 0" name="root_location"/><label>Theme</label><span><select name="theme"><option value="default">Default</option></select></span>
+					<input type="button" value="Submit" id="action-newblog" style="float:right"/>
+					<!-- <h3>Meta information</h3>
+					<label>Pagination article threshold</label><input type="number" value="6" name="blog-pagination" /> -->
 				</form>
 			</div>
 			<div class="half">
@@ -174,9 +187,9 @@
 				<h3>Author</h3>
 				<form id="author">
 					<div class="avatar"><i class="icon-user"></i></div>
-					<input type="text" placeholder="Name" name="author-name" value="{{author_name}}"/><br>
-					<input type="text" placeholder="Email" name="author-email" value="{{author_email}}"/>
-					<textarea placeholder="Bio" name="author-bio" value="{{author_bio}}"></textarea>
+					<input type="text" placeholder="Name" name="author-name" value="{{author.name}}"/><br>
+					<input type="text" placeholder="Email" name="author-email" value="{{author.email}}"/>
+					<textarea placeholder="Bio" name="author-bio" value="{{author.bio}}"></textarea>
 				</form>
 			</div>
 			<div class="half">
