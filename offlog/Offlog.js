@@ -4,7 +4,7 @@ var Offlog = {
 		main: document.getElementById("main-container")
 	},
 
-	defaultView: "Home",
+	defaultView: "Drafts",
 
 	views: {},
 
@@ -487,7 +487,7 @@ Offlog.Blog = function(options) {
 			id: (Offlog.config("blogs") || []).length + 1,
 			theme: "default",
 			articles: [],
-			timestamp: new Date().toString()
+			timestamp: new Date().toJSON()
 		}, required = ["title", "root_location"];
 
 		required.forEach(function(req) { if(!merge[req]) { throw new Error(req + " not supplied to new blog."); }});
@@ -532,6 +532,25 @@ Offlog.Blog.prototype.save = function() {
 	Offlog.config("blogs", blogs);
 };
 
+Offlog.Article = function(title, text) {
+	this.article = {
+		title: title,
+		content: text,
+		id: (Offlog.config("drafts") || []).length + 1,
+		timestamp: new Date().toJSON(),
+		published: false
+	}
+};
+
+Offlog.Article.prototype.save = function() {
+	var drafts = Offlog.config("drafts") || [];
+	drafts.push(this.article)
+	Offlog.config("drafts", drafts);
+};
+
+Offlog.Article.prototype.update = function(obj) {
+	for(var key in obj) this.article[key] = obj[key];
+};
 /* Event Handling */
 window.addEventListener("DOMContentLoaded", function() { Offlog.init() });
 window.addEventListener("resize", function() { Offlog.resize() });

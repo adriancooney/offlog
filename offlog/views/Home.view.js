@@ -7,7 +7,8 @@ Offlog.registerView("Home", function() {
 		},
 
 		"date": function() {
-			return 1;
+			var d = new Date(this.timestamp);
+			return d.getDate() + "/" + d.getMonth() + "/" + d.getFullYear();
 		},
 
 		"article_count": function() {

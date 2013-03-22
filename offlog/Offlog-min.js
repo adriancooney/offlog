@@ -4,7 +4,7 @@ var Offlog = {
 		main: document.getElementById("main-container")
 	},
 
-	defaultView: "Home",
+	defaultView: "Drafts",
 
 	views: {},
 
@@ -487,7 +487,7 @@ Offlog.Blog = function(options) {
 			id: (Offlog.config("blogs") || []).length + 1,
 			theme: "default",
 			articles: [],
-			timestamp: new Date().toString()
+			timestamp: new Date().toJSON()
 		}, required = ["title", "root_location"];
 
 		required.forEach(function(req) { if(!merge[req]) { throw new Error(req + " not supplied to new blog."); }});
@@ -532,6 +532,25 @@ Offlog.Blog.prototype.save = function() {
 	Offlog.config("blogs", blogs);
 };
 
+Offlog.Article = function(title, text) {
+	this.article = {
+		title: title,
+		content: text,
+		id: (Offlog.config("drafts") || []).length + 1,
+		timestamp: new Date().toJSON(),
+		published: false
+	}
+};
+
+Offlog.Article.prototype.save = function() {
+	var drafts = Offlog.config("drafts") || [];
+	drafts.push(this.article)
+	Offlog.config("drafts", drafts);
+};
+
+Offlog.Article.prototype.update = function(obj) {
+	for(var key in obj) this.article[key] = obj[key];
+};
 /* Event Handling */
 window.addEventListener("DOMContentLoaded", function() { Offlog.init() });
 window.addEventListener("resize", function() { Offlog.resize() });
@@ -599,7 +618,9 @@ Offlog.registerView("Help", function() {
 ********************************************** */
 
 Offlog.registerView("Drafts", function() {
-	Offlog.Template.render("drafts", Offlog.containers.main);
+	Offlog.Template.render("drafts", Offlog.containers.main, {
+		drafts: Offlog.config("drafts") || []
+	});
 
 	Offlog.main.resizeElement(this, document.querySelectorAll(".preview")[0]);
 });
@@ -617,7 +638,8 @@ Offlog.registerView("Home", function() {
 		},
 
 		"date": function() {
-			return 1;
+			var d = new Date(this.timestamp);
+			return d.getDate() + "/" + d.getMonth() + "/" + d.getFullYear();
 		},
 
 		"article_count": function() {
@@ -848,5 +870,29 @@ Offlog.registerView("NewPost", function() {
 		}
 	});
 
-	
+	this.addEventListener(document.getElementById("post-save"), "click", function() {
+		//Check to see if there's a title
+		var title = document.getElementById("new-post-title").value,
+			content = document.getElementById("new-post-content").value;
+
+		if(!Offlog.config("current_draft")) {
+			//create a new article instance
+			if(!title) return new Offlog.Notification("error", "No Title", "Please supply a title before saving");
+
+			var article = new Offlog.Article(title, content);
+			article.save();
+
+			Offlog.config("current_draft", article.id);
+			return new Offlog.Notification("success", "Draft saved", "Draft successfully saved.");
+		} else {
+			var article = Offlog.config("drafts")[Offlog.config("current_draft") - 1];
+
+			article.update({
+				title: title,
+				content: content
+			});
+		}
+	})
+
+	Offlog.main.resizeElement(this, document.getElementById("new-post-content"), 70);
 });

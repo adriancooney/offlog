@@ -68,7 +68,6 @@
 								<li><span>Created:</span> <em>{{date}}</em></li>
 								<li><span>Articles:</span> <em>{{article_count}}</em></li>
 								<li><span>Theme:</span> <em>{{theme}}</em></li>
-								<li><span>Drafts:</span> <em>{{draft_count}}</em></li>
 								<li><span>Root:</span> <em class="mono">{{root_location}}</em></li>
 							</ul>
 						</div>
@@ -114,10 +113,9 @@
 		<div class="row columns">
 			<div class="half">
 				<ul class="drafts-list">
-					<li class="active"><i class="icon-file-alt draft-icon"></i><i class="icon-chevron-right arrow"></i><h4>This is my very first post ever.</h4><h5>3 days ago in blog <span>My blog</span></h5></li>
-					<li><i class="icon-file-alt draft-icon"></i><i class="icon-chevron-right arrow"></i><h4>This is my very first post ever.</h4><h5>3 days ago.</h5></li>
-					<li><i class="icon-file-alt draft-icon"></i><i class="icon-chevron-right arrow"></i><h4>This is my very first post ever.</h4><h5>3 days ago.</h5></li>
-					<li><i class="icon-file-alt draft-icon"></i><i class="icon-chevron-right arrow"></i><h4>This is my very first post ever.</h4><h5>3 days ago.</h5></li>
+					{{#drafts}}
+					<li class="active"><i class="icon-file-alt draft-icon"></i><i class="icon-chevron-right arrow"></i><h4>{{draft_title}}</h4><h5>{{date}}</h5></li>
+					{{/drafts}}
 				</ul>
 			</div>
 			<div class="half preview">
