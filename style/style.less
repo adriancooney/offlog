@@ -305,6 +305,86 @@ body {
 
 }
 
+
+#main-container[data-template="home"] {
+	article {
+		height: 160px;
+		margin: 16px;
+		background: #fff;
+		border-bottom: 2px solid rgba(0,0,0,0.1);
+		padding: 12px;
+
+		h2 {
+			font-size: 28px;
+			font-weight: bold;
+			margin-bottom: 8px;
+		}
+
+		.des, .stats {
+			height: auto;
+			margin-top: 6px;
+		}
+
+		.des {
+			box-shadow: 1px 0 0 rgba(0,0,0,0.1);
+			overflow-y: scroll;
+			height: 110px;
+	
+			p {
+				font-size: 14px;
+				margin: 0;
+				padding: 0;
+				line-height: 120%;
+				padding-right: 5px;
+			}
+		}
+
+		.stats {
+			li {
+				padding: 2px 6px;
+				font-size: 16px;
+				margin-left: 12px;
+				width: 140px;
+				height: 18px;
+				em.mono {
+					font-family: monospace;
+				}
+
+				span {
+					font-weight: bold;
+					color: #9e9ec0;
+				}
+			}
+		}
+
+		.actions {
+			float: right;
+
+			i {
+				font-size: 24px;
+				margin: 6px;
+				color: #272730;
+				cursor: pointer;
+			}
+
+			i:nth-child(3) {
+				font-size: 22px;
+			}
+
+			i:hover:after {
+				content: attr(alt);
+				position: absolute;
+				background: rgba(0,0,0,0.8);
+				font-size: 12px;
+				color: #fff;
+				padding: 4px;
+				margin-top: 28px;
+				margin-left: -50px;
+			}
+		}
+	}
+}
+
 #main-container[data-template="drafts"] {
 	.preview {
 		background: #fff;

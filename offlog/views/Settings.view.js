@@ -18,7 +18,7 @@ Offlog.registerView("Settings", function(view) {
 
 	this.addEventListener(document.getElementById("github-deauthorize"), "click", function() {
 		// De authorize the user
-		Offlog.config("rm", ["gh_integration", "gh_password", "gh_username"]);
+		Offlog.config("rm", ["gh_integration", "gh_password", "gh_username", "author_email", "author_name"]);
 
 		view.render();
 		new Offlog.Notification("success", "Github Deauthorized", "Github account deauthorized successfully.");

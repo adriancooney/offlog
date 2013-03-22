@@ -4,7 +4,7 @@ var Offlog = {
 		main: document.getElementById("main-container")
 	},
 
-	defaultView: "NewBlog",
+	defaultView: "Home",
 
 	views: {},
 
@@ -96,6 +96,8 @@ var Offlog = {
 	init: function() {
 		// Correct dimensions
 		this.resize();
+
+		//Initilize some variables
 
 		//Render the default view
 		this.renderView(this.defaultView);
@@ -430,7 +432,7 @@ Offlog.Modal.prototype.die = function() {
 };
 
 Offlog.Filesystem = {
-	/*fs: (function() {
+	fs: (function() {
 		webkitStorageInfo.requestQuota(window.PERSISTENT, 1024 * 1024, function(availableBytes) {
 				console.log(availableBytes);
 				window.webkitRequestFileSystem(window.PERSISTENT, 5 * 1024 * 1024, function(tfs) {
@@ -439,7 +441,7 @@ Offlog.Filesystem = {
 				});
 		 	}
 		);
-	})(),*/
+	})(),
 
 	moveContext: function() {
 		chrome.fileSystem.chooseEntry({ type: 'openFile' }, function() { console.log(arguments); });
@@ -459,6 +461,58 @@ Offlog.Filesystem = {
 
 		dir.readEntries(callback);
 	}
+};
+
+/**
+ * Offlog Blog class
+ */
+Offlog.Blog = function(options) {
+	this.blog = (function(merge) {
+		var defaults = {
+			theme: "default",
+			articles: []
+		}, required = ["title", "description", "user"];
+
+		required.forEach(function(req) { if(!merge[req]) { throw new Error(req + " not supplied to new blog."); }});
+		for(var key in defaults) if(!merge[key]) merge[key] = defaults[key];
+
+		return merge;
+	})(options);
+};
+
+Offlog.Blog.prototype.compile = function() {
+	var theme = this.getTheme(theme);
+
+	//Right so, compilation
+	//First off, we a need a config file for Offlog to allow users to switch 
+	//between computers. Secondly, we need an index.html, and folders with their
+	//own index.html for articles.
+	
+
+};
+
+Offlog.Blog.prototype.newArticle = function(data) {
+	data = (function(data) {
+		var defaults = {
+			published: false
+		};
+
+		for(var key in defaults) if(!data[key]) data[key] = defaults[key];
+
+		return data;
+	})(data);
+
+	console.log(data);
+};
+
+Offlog.Blog.prototype.getTheme = function(theme) {
+	return exampleTheme;
+};
+
+Offlog.Blog.prototype.save = function() {
+	var blogs = Offlog.config("blogs") || [];
+	blogs.push(this.blog)
+	Offlog.config("blogs", blogs);
 };
 
 /* Event Handling */
@@ -508,6 +562,11 @@ Offlog.containers.sidebar.addEventListener("mouseout", function(event) {
 	//Close it anyway
 	if(!menuClick) Offlog.sidebar.close();
 });
+
+/**
+ * Development
+ */
+var exampleTheme = "<html><head><title>{{blog_title}}</title><link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'><style type=\"text/css\">body {font-family: 'Open Sans', sans-serif;}.wrapper {width: 580px;margin: 0 auto;}header {border-bottom: 2px solid rgba(0,0,0,0.3);}header nav {float: right;width: 160px;}header nav li {display: inline-block;margin: 8px 2px;padding: 4px 12px;background: rgba(0,0,0,0.8);}header nav li a {color: #fff;}article {border-bottom: 1px solid rgba(0,0,0,0.2);}article h1 {font-family: Georgia;font-weight: 100;font-style: italic;}article h1 span {display: block;float: right;width: 50px;font-family: georgia;font-size: 50px;text-align: center;margin-top: -12px;}article h1 span em {font-size: 14px;}article p {color: #444;}footer {text-align: center;color: rgba(0,0,0,0.6);font-size: 80%;}</style></head><body><div class=\"wrapper\"><header><h1>{{blog_title}}</h1></header>{{#article}}<article><h1><span>{{article_date}}<br><em>{{article_month}}</em></span>{{article_title}}</h1>{{article_content}}</article>{{/article}}<footer><p>&copy; {{date.year}} {{author_name}}</p></footer></div></body></html>";
 
 /* **********************************************
      Begin Help.view.js
@@ -597,7 +656,7 @@ Offlog.registerView("Settings", function(view) {
 
 	this.addEventListener(document.getElementById("github-deauthorize"), "click", function() {
 		// De authorize the user
-		Offlog.config("rm", ["gh_integration", "gh_password", "gh_username"]);
+		Offlog.config("rm", ["gh_integration", "gh_password", "gh_username", "author_email", "author_name"]);
 
 		view.render();
 		new Offlog.Notification("success", "Github Deauthorized", "Github account deauthorized successfully.");

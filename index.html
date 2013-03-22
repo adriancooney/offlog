@@ -50,6 +50,29 @@
 		<div class="row columns">
 			<div class="half">
 				<h3>Available Blogs</h3>
+				<article>
+					<div class="actions">
+						<i class="icon-cog" alt="Edit Blog Settings"></i>
+						<i class="icon-trash" alt="Delete Blog"></i>
+						<i class="icon-external-link" alt="Open Blog"></i>
+						<i class="icon-signout" alt="Publish Blog To Github"></i>
+					</div>
+					<h2>My Blog</h2>
+					<div class="rows columns">
+						<div class="half des">
+							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium voluptas autem laborum maxime expedita possimus accusamus assumenda totam. Cum magnam facere nemo eveniet molestiae harum assumenda quos laudantium excepturi iure?</p>
+						</div>
+						<div class="half stats">
+							<ul>
+								<li><span>Created:</span> <em>5/3/13</em></li>
+								<li><span>Articles:</span> <em>0</em></li>
+								<li><span>Theme:</span> <em>Default</em></li>
+								<li><span>Drafts:</span> <em>1</em></li>
+								<li><span>Root:</span> <em class="mono">blog/</em></li>
+							</ul>
+						</div>
+					</div>
+				</article>
 			</div>
 			<div class="half"></div>
 		</div>
@@ -78,7 +101,7 @@
 		<div class="row columns">
 			<div class="half">
 				<ul class="drafts-list">
-					<li class="active"><i class="icon-file-alt draft-icon"></i><i class="icon-chevron-right arrow"></i><h4>This is my very first post ever.</h4><h5>3 days ago.</h5></li>
+					<li class="active"><i class="icon-file-alt draft-icon"></i><i class="icon-chevron-right arrow"></i><h4>This is my very first post ever.</h4><h5>3 days ago in blog <span>My blog</span></h5></li>
 					<li><i class="icon-file-alt draft-icon"></i><i class="icon-chevron-right arrow"></i><h4>This is my very first post ever.</h4><h5>3 days ago.</h5></li>
 					<li><i class="icon-file-alt draft-icon"></i><i class="icon-chevron-right arrow"></i><h4>This is my very first post ever.</h4><h5>3 days ago.</h5></li>
 					<li><i class="icon-file-alt draft-icon"></i><i class="icon-chevron-right arrow"></i><h4>This is my very first post ever.</h4><h5>3 days ago.</h5></li>
@@ -193,10 +216,13 @@
 		</div>
 	</aside>
 	<section id="main-container"></section>
+
 </body>
 
 <script src="lib/mustache.js"></script>
 <script src="lib/codemirror.js"></script>
+
+<script src="lib/markdown.js"></script>
 
 <!-- Github Integration Library, frustrating that is has such large dependancies -->
 <script src="lib/github/lib/underscore-min.js"></script>
