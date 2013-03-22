@@ -1208,7 +1208,7 @@ body {
   font-size: 18px;
   margin-top: 4px;
 }
-#main-container[data-template="settings"] #github {
+#main-container[data-template="settings"] .github-button {
   background: #fafafa;
   /* Old browsers */
 
@@ -1244,12 +1244,12 @@ body {
   margin-top: 12px;
   cursor: pointer;
 }
-#main-container[data-template="settings"] #github i {
+#main-container[data-template="settings"] .github-button i {
   padding: 0 8px;
   border-right: 1px solid #fff;
   -webkit-box-shadow: 1px 0 0 #aaa;
 }
-#main-container[data-template="settings"] #github span {
+#main-container[data-template="settings"] .github-button span {
   display: inline-block;
   margin-left: 8px;
 }
@@ -1279,10 +1279,17 @@ body {
   /* IE6-9 */
 
 }
-#main-container[data-template="settings"] .not-integrated {
+#main-container[data-template="settings"] .integrated {
   font-size: 22px;
   margin-top: 20px;
+  color: #2bc03f;
+}
+#main-container[data-template="settings"] .integrated.not {
   color: #9e0b0f;
+}
+#main-container[data-template="settings"] .disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 #main-container[data-template="drafts"] .preview {
   background: #fff;

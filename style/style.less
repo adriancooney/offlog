@@ -219,7 +219,7 @@ body {
 }
 
 #main-container[data-template="settings"] {
-	#github {
+	.github-button {
 		background: rgb(250,250,250); /* Old browsers */
 		background: -moz-linear-gradient(top, rgba(250,250,250,1) 0%, rgba(233,233,233,1) 100%); /* FF3.6+ */
 		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(250,250,250,1)), color-stop(100%,rgba(233,233,233,1))); /* Chrome,Safari4+ */
@@ -262,11 +262,25 @@ body {
 		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e9e9e9', endColorstr='#fafafa',GradientType=0 ); /* IE6-9 */
 	}
 
-	.not-integrated {
+	.integrated {
 		font-size: 22px;
 		margin-top: 20px;
+		color: #2bc03f;
+	}
+
+	.integrated.not {
 		color: #9e0b0f;
 	}
+
+	.disabled {
+		opacity: 0.5;
+		cursor: default;
+	}
+}
+
+
+#main-container[data-template="help"] {
+	
 }
 
 #main-container[data-template="drafts"] {

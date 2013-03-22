@@ -98,6 +98,11 @@ var Offlog = {
 		this.renderView("Settings");
 	},
 
+	working: function(bool) {
+		if(bool) document.getElementById("working").classList.remove("inactive")
+		else document.getElementById("working").classList.add("inactive");
+	},
+
 	registerView: function(view, init, die) {
 		this.views[view] = new Offlog.View(view, init, die);
 	},
@@ -131,30 +136,30 @@ Offlog.View = function(name, init, die) {
 
 Offlog.View.prototype.render = function() {
 	this._init.call(this);
-	this._bindEvents();
+	this.bindEvents();
 };
 
 Offlog.View.prototype.die = function() {
 	this._die.call(this);
-	this._unbindEvents();
+	this.unbindEvents();
 };
 
 Offlog.View.prototype.addEventListener = function(elem, event, fn) {
 	this.events.push([elem, event, fn]);
 };
 
-Offlog.View.prototype._bindEvents = function() {
+Offlog.View.prototype.bindEvents = function() {
 	var that = this;
 	this.events.forEach(function(eventObj) {
-		eventObj[0].addEventListener(eventObj[1], function() {
+		if(eventObj[0]) eventObj[0].addEventListener(eventObj[1], function() {
 			eventObj[2].call(that)
 		});
 	});
 };
 
-Offlog.View.prototype._unbindEvents = function() {
+Offlog.View.prototype.unbindEvents = function() {
 	this.events.forEach(function(eventObj) {
-		eventObj[0].removeEventListener(eventObj[1], eventObj[2]);
+		if(eventObj[0]) eventObj[0].removeEventListener(eventObj[1], eventObj[2]);
 	});
 };
 
@@ -185,11 +190,15 @@ Offlog.Storage = {
 	},
 
 	"get": function(name) {
-		if(this.exists(name)) {
+		if(this.exists(name)) return JSON.parse(window.localStorage.getItem(name));
+	},
 
-			return JSON.parse(window.localStorage.getItem(name));
+	"delete": function(arr) {
+		if(typeof arr == "string") arr = [arr];
 
-		} else throw new Error("Key does not exist");
+		arr.forEach(function(val) {
+			window.localStorage.removeItem(val);
+		})
 	},
 
 	exists: function(name) {
@@ -198,6 +207,13 @@ Offlog.Storage = {
 };
 
 Offlog.config = function(name, val) {
+	if(name == "rm" || name == "delete" || name == "remove") {
+		if(typeof val !== "string") val = val.map(function(v) { return "config_" + v; })
+		else val = "config_" + val;
+
+		return Offlog.Storage.delete(val);
+	}
+
 	name = "config_" + name;
 
 	if(name && val) return Offlog.Storage.set(name, val);
@@ -231,7 +247,37 @@ Offlog.Github = {
 
 	error: function(e) {
 
-	}
+	},
+
+	api: function(username, password) {
+		Offlog.config("gh_integration", true);
+		Offlog.config("gh_username", username);
+
+		// Not a fan of this but impossible to travel between sessions without it
+		Offlog.config("gh_password", Base64.encode(password));
+
+		Offlog.Github.gh();
+	},
+
+	getUser: function(username, callback) {
+		Offlog.gh.getUser().show(Offlog.config(username), Offlog.Github.callback(callback));
+	},
+
+	gh: setTimeout(function integrate() {
+
+		if(Offlog.config("gh_integration")) {
+			var gh = new Github({
+				username: Offlog.config("gh_username"),
+				password: Base64.decode(Offlog.config("gh_password")),
+				auth: "basic"
+			});
+
+
+			//if(!Offlog.config("gh_user")) 
+
+			return gh;
+		} else return integrate;
+	}, 100)
 };
 
 /**
@@ -516,10 +562,31 @@ Offlog.registerView("NewBlog", function() {
      Begin Settings.view.js
 ********************************************** */
 
-Offlog.registerView("Settings", function() {
-	Offlog.Template.render("settings", Offlog.containers.main);
+Offlog.registerView("Settings", function(view) {
 
-	this.addEventListener(document.getElementById("github"), "click", function() {
+	var notIntegrated = "<h4 class=\"integrated not\"><i class=\"icon-warning-sign\"></i> Github not integrated.</h4>";
+	var isIntegrated = "<h4 class=\"integrated\"><i class=\"icon-ok\"></i> Github integrated.</h4>";
+	var actionIntegrate = "<h5 class=\"github-button\" id=\"github-signin\"><i class=\"icon-github\"></i><span>Github Login</span></h5>";
+	var actionDeauthorize = "<h5 class=\"github-button\" id=\"github-deauthorize\"><i class=\"icon-github\"></i><span>Remove Account</span></h5>";
+
+
+	Offlog.Template.render("settings", Offlog.containers.main, {
+		"author_name": Offlog.config("author_name"),
+		"author_email": Offlog.config("author_email"),
+		"author_bio": Offlog.config("author_bio"),
+		"integration_text": Offlog.config("gh_integration") ? isIntegrated : notIntegrated,
+		"integration_disabled": Offlog.config("gh_integration") ? "disabled" : "",
+		"integration_actions": Offlog.config("gh_integration") ? actionDeauthorize : actionIntegrate
+	});
+
+	this.addEventListener(document.getElementById("github-deauthorize"), "click", function() {
+		// De authorize the user
+		Offlog.config("rm", ["gh_integration", "gh_password", "gh_username"]);
+
+		new Offlog.Notification("success", "Github Deauthorized", "Github account deauthorized successfully.");
+	});
+
+	this.addEventListener(document.getElementById("github-signin"), "click", function() {
 		console.log(this);
 		var modal = new Offlog.Modal(Mustache.render(Offlog.Template.templates["github-login"][0]), 400, 340);
 
@@ -562,10 +629,6 @@ Offlog.registerView("Settings", function() {
 			document.getElementById("load").classList.add("inactive");
 		}
 	});
-
-	function showUserInformation() {
-
-	}
 });
 
 /* **********************************************

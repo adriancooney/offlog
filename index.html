@@ -130,6 +130,9 @@
 		<div class="blog-bar">
 			<h3><i class="icon-medkit type"></i> Help</h3>
 		</div>
+		<section class="help">
+			<h4>Why do we need to log into Github?</h4>
+			<p>Chrome's Filesystem API is, well frankly, shit. I'd love to be able to write the blog to a user specified location but the Filesystem API only allows me to write to a sandboxed folder. <em>But you can download files created?</em> Yeah you can but individually. Do you really want to download each blog file individually? Until Chrome provides a method to save files in bulk in a location specified, Github is the only answer.</p>
 	</script>
 
 	<script type="text/template" data-id="edit-theme">
@@ -147,19 +150,19 @@
 			<div class="half">
 				<h3>Author</h3>
 				<form id="author">
-					<input type="text" placeholder="Name" name="author-name" /><br>
-					<input type="text" placeholder="Email" name="author-email" />
-					<textarea placeholder="Bio" name="author-bio"></textarea>
+					<input type="text" placeholder="Name" name="author-name" value="{{author_name}}"/><br>
+					<input type="text" placeholder="Email" name="author-email" value="{{author_email}}"/>
+					<textarea placeholder="Bio" name="author-bio" value="{{author_bio}}"></textarea>
 				</form>
 			</div>
 			<div class="half">
 				<h3>Github Integration</h3>
 				<div class="row columns" style="height: 80px; width: 100%; text-align: center;">
 					<div class="half">
-						<h4 class="not-integrated"><i class="icon-warning-sign"></i> Github not integrated.</h4>
+						{{{integration_text}}}
 					</div>
 					<div class="half">
-						<h5 id="github"><i class="icon-github"></i><span>Github Login</span></h5>
+						{{{integration_actions}}}
 					</div>
 				</div>
 				<h3>Writing</h3>
@@ -185,7 +188,7 @@
 			<li><i class="icon-tint"></i> <span>Edit Theme</span></li>
 		</nav>
 		<div class="logo">
-			<span class="spinner black"></span>
+			<span class="spinner black inactive" id="working"></span>
 		</div>
 	</aside>
 	<section id="main-container"></section>
