@@ -103,14 +103,14 @@
 					<h3>Identification</h3>
 					<input type="text" placeholder="Blog Name" name="blog-name" /><br>
 					<textarea placeholder="Description"></textarea>
-					<label>Theme</label><span><select><option value="default">Default</option></select></span>
+					<input type="text" placeholder="Root Location (/blog)" style="width:26%;margin-right: 0"/><label>Theme</label><span><select><option value="default">Default</option></select></span>
 					<input type="submit" value="Submit" style="float:right"/>
 					<h3>Meta information</h3>
 					<label>Pagination article threshold</label><input type="number" value="6" name="blog-pagination" />
 				</form>
 			</div>
 			<div class="half">
-				<h3>File Structure</h3>
+				<!-- <h3>File Structure</h3>
 				<div class="cabinet"><li class="dir">blog/</li>
 					<div><li>index.html</li>
 						<li>about.html</li>
@@ -121,7 +121,7 @@
 							<li>third-post.html</li>
 						</div>
 					</div>
-				</div>
+				</div> -->
 			</div>
 		</div>
 	</script>
@@ -150,6 +150,7 @@
 			<div class="half">
 				<h3>Author</h3>
 				<form id="author">
+					<div class="avatar"><i class="icon-user"></i></div>
 					<input type="text" placeholder="Name" name="author-name" value="{{author_name}}"/><br>
 					<input type="text" placeholder="Email" name="author-email" value="{{author_email}}"/>
 					<textarea placeholder="Bio" name="author-bio" value="{{author_bio}}"></textarea>

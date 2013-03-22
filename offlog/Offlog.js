@@ -4,6 +4,8 @@ var Offlog = {
 		main: document.getElementById("main-container")
 	},
 
+	defaultView: "NewBlog",
+
 	views: {},
 
 	sidebar: {
@@ -95,7 +97,8 @@ var Offlog = {
 		// Correct dimensions
 		this.resize();
 
-		this.renderView("Settings");
+		//Render the default view
+		this.renderView(this.defaultView);
 	},
 
 	working: function(bool) {
@@ -135,7 +138,7 @@ Offlog.View = function(name, init, die) {
 };
 
 Offlog.View.prototype.render = function() {
-	this._init.call(this);
+	this._init.call(this, this);
 	this.bindEvents();
 };
 
@@ -246,38 +249,51 @@ Offlog.Github = {
 	},
 
 	error: function(e) {
+		// Error codes
+		// HTTP 4XX
+		// Custom Errors
+		// 		1 -- Github not integrated
 
+		switch( e ) {
+			case 1:
+				new Offlog.Notification("error", "Github not integrated", "Please visit the settings pane and login to Github.");
+			break;
+		}
 	},
 
-	api: function(username, password) {
-		Offlog.config("gh_integration", true);
-		Offlog.config("gh_username", username);
+	isIntegrated: function() {
+		return Offlog.config("gh_integration");
+	},
 
-		// Not a fan of this but impossible to travel between sessions without it
-		Offlog.config("gh_password", Base64.encode(password));
+	// Singleton Class for the github API
+	api: function() {
+		if(!this.gh) {
+			if(this.isIntegrated())
+				return this.gh = new Github({
+					username: Offlog.config("gh_username"),
+					password: Base64.decode(Offlog.config("gh_password")),
+					auth: "basic"
+				});
+			else this.error(1);
+		} else return this.gh;
+	},
 
-		Offlog.Github.gh();
+	getAuthorInformation: function(clbk) {
+		Offlog.Github.getUser(Offlog.config("gh_username"), function(user) {
+			user = user[0];
+
+			Offlog.config("author_name", user.name);
+			Offlog.config("author_email", user.email);
+			Offlog.config("author_bio", user.bio);
+			Offlog.config("author_avatar", user.avatar);
+
+			clbk();
+		});
 	},
 
 	getUser: function(username, callback) {
-		Offlog.gh.getUser().show(Offlog.config(username), Offlog.Github.callback(callback));
-	},
-
-	gh: setTimeout(function integrate() {
-
-		if(Offlog.config("gh_integration")) {
-			var gh = new Github({
-				username: Offlog.config("gh_username"),
-				password: Base64.decode(Offlog.config("gh_password")),
-				auth: "basic"
-			});
-
-
-			//if(!Offlog.config("gh_user")) 
-
-			return gh;
-		} else return integrate;
-	}, 100)
+		Offlog.Github.api().getUser().show(Offlog.config(username), Offlog.Github.callback(callback));
+	}
 };
 
 /**
@@ -310,7 +326,6 @@ Offlog.Template = {
 				return part;
 			})() : [];
 
-			console.log(partials);
 		var templateData = Mustache.render(templateArr[0], data, partials);
 
 		where.setAttribute("data-template", template);

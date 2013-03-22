@@ -10,6 +10,7 @@ Offlog.registerView("Settings", function(view) {
 		"author_name": Offlog.config("author_name"),
 		"author_email": Offlog.config("author_email"),
 		"author_bio": Offlog.config("author_bio"),
+		"author_avatar": Offlog.config("author_avatar"),
 		"integration_text": Offlog.config("gh_integration") ? isIntegrated : notIntegrated,
 		"integration_disabled": Offlog.config("gh_integration") ? "disabled" : "",
 		"integration_actions": Offlog.config("gh_integration") ? actionDeauthorize : actionIntegrate
@@ -19,11 +20,12 @@ Offlog.registerView("Settings", function(view) {
 		// De authorize the user
 		Offlog.config("rm", ["gh_integration", "gh_password", "gh_username"]);
 
+		view.render();
 		new Offlog.Notification("success", "Github Deauthorized", "Github account deauthorized successfully.");
 	});
 
 	this.addEventListener(document.getElementById("github-signin"), "click", function() {
-		console.log(this);
+		view.render();
 		var modal = new Offlog.Modal(Mustache.render(Offlog.Template.templates["github-login"][0]), 400, 340);
 
 		// Bind the events to the buttons
@@ -46,10 +48,18 @@ Offlog.registerView("Settings", function(view) {
 						new Offlog.Notification("success", "Valid Credentials", "Your Github credentials are valid.");
 						modal.die();
 
-						//And set the interface
-						Offlog.Github.api(username, password);
+						//And set the user information
+						Offlog.config("gh_integration", true);
+						Offlog.config("gh_username", username);
 
-						showUserInformation();
+						// Not a fan of this but impossible to travel between sessions without it
+						Offlog.config("gh_password", Base64.encode(password));
+
+						//Set the user information
+						Offlog.Github.getAuthorInformation(function() {
+							console.log("Rendering!");
+							view.render();
+						});
 					} else new Offlog.Notification("error", "Invalid Credentials", "Please provide valid Github credentials.");
 				})
 			} else {

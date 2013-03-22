@@ -1291,6 +1291,25 @@ body {
   opacity: 0.5;
   cursor: default;
 }
+#main-container[data-template="settings"] .avatar {
+  width: 12%;
+  height: 86px;
+  float: left;
+  margin: 8px 16px;
+  background: #fff;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  margin-right: 0;
+  text-align: center;
+}
+#main-container[data-template="settings"] .avatar i {
+  display: inline-block;
+  color: rgba(0, 0, 0, 0.1);
+  font-size: 60px;
+  margin: 16px 0;
+}
+#main-container[data-template="settings"] input[type=text] {
+  width: 80%;
+}
 #main-container[data-template="drafts"] .preview {
   background: #fff;
   height: 100%;
