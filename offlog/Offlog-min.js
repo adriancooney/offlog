@@ -532,25 +532,83 @@ Offlog.Blog.prototype.save = function() {
 	Offlog.config("blogs", blogs);
 };
 
+/**
+ * Offlog's article storage system
+ * @param {string} title The title of the article
+ * @param {string} text  The content of the article
+ */
 Offlog.Article = function(title, text) {
 	this.article = {
 		title: title,
 		content: text,
-		id: (Offlog.config("drafts") || []).length + 1,
 		timestamp: new Date().toJSON(),
 		published: false
 	}
 };
 
 Offlog.Article.prototype.save = function() {
-	var drafts = Offlog.config("drafts") || [];
-	drafts.push(this.article)
-	Offlog.config("drafts", drafts);
+	var drafts = new Offlog.List(Offlog.config("drafts"));
+	var item = drafts.addItem(this.article);
+	Offlog.config("drafts", drafts.toJSON());
+
+	return item.id;
 };
 
-Offlog.Article.prototype.update = function(obj) {
-	for(var key in obj) this.article[key] = obj[key];
+/**
+ * Database like list functionality with id's for objects
+ * @param {object} list And existing list
+ */
+Offlog.List = function(list) {
+	console.log("List input: ", list);
+	if(list && typeof list == "object") {
+		// Existing list
+		this.list = list.list;
+		this.lastInsertId = list.lastInsertId;
+	} else if(typeof list == "string") {
+		var o = JSON.parse(list);
+		// Existing list
+		this.list = o.list;
+		this.lastInsertId = o.lastInsertId;
+	} else {
+		// New list
+		this.list = [];
+		this.lastInsertId = 0;
+	}
+
+	this.__defineGetter__("length", function() {
+		return this.list.length;
+	});
 };
+
+Offlog.List.prototype.toJSON = function() {
+	return JSON.stringify({
+		list: this.list,
+		lastInsertId: this.lastInsertId
+	});
+};
+
+Offlog.List.prototype.addItem = function(data) {
+	this.lastInsertId++;
+	data.id = this.lastInsertId;
+	this.list.push(data);
+	return data;
+};
+
+Offlog.List.prototype.updateItemById = function(id, data) {
+	for(var i = 0; i < this.list.length; i++) if(this.list[i].id == id) {
+		data.id = id;
+		this.list[i] = data;
+	}
+};
+
+Offlog.List.prototype.removeItemById = function(id) {
+	for(var i = 0; i < this.list.length; i++) if(this.list[i].id == id) this.list.splice(i, 1);
+};
+
+Offlog.List.prototype.getItemById = function(id) {
+	for(var i = 0; i < this.list.length; i++) if(this.list[i].id == id) return this.list[i];
+};
+
 /* Event Handling */
 window.addEventListener("DOMContentLoaded", function() { Offlog.init() });
 window.addEventListener("resize", function() { Offlog.resize() });
@@ -617,10 +675,62 @@ Offlog.registerView("Help", function() {
      Begin Drafts.view.js
 ********************************************** */
 
-Offlog.registerView("Drafts", function() {
+Offlog.registerView("Drafts", function(view) {
+	var drafts = new Offlog.List(Offlog.config("drafts"));
 	Offlog.Template.render("drafts", Offlog.containers.main, {
-		drafts: Offlog.config("drafts") || []
+		drafts: drafts.list,
+
+		"drafts_empty": function() {
+			if(this.drafts.length == 0) return true;
+			else return false;
+		},
+
+		"date": function() {
+			//This is a really nice library, kudos
+			//https://github.com/zachleat/Humane-Dates
+			return humaneDate(this.timestamp);
+		}
 	});
+
+	var draftsList = document.querySelectorAll(".drafts-list li"),
+		toolbar = document.getElementById("toolbar"),
+		placeholder = document.querySelectorAll(".placeholder")[0];
+
+	Array.prototype.forEach.call(draftsList, function(draft) {
+		draft.addEventListener("click", function() {
+			var id = parseInt(this.id.replace("article-", ""));
+
+			displayDraft(drafts.getItemById(id));
+		});
+	});
+
+	function displayDraft(draft) {
+
+		var title = "<h1>" + draft.title + "</h1>",
+			content = markdown.toHTML(draft.content);
+
+		placeholder.setAttribute("data-article", draft.id);
+
+		toolbar.classList.remove("inactive");
+
+		placeholder.innerHTML = title + content;
+	}
+
+	this.addEventListener(document.getElementById("continue-editing-draft"), "click", function() {
+		Offlog.config("current_draft", parseInt(placeholder.getAttribute("data-article")));
+
+		Offlog.renderView("NewPost")
+	})
+
+	this.addEventListener(document.getElementById("delete-draft"), "click", function() {
+		var id = parseInt(placeholder.getAttribute("data-article"));
+
+		if(Offlog.config("current_draft") == id) Offlog.config("rm", "current_draft");
+		drafts.removeItemById(id);
+		Offlog.config("drafts", drafts.toJSON());
+
+		view.render();
+	})
 
 	Offlog.main.resizeElement(this, document.querySelectorAll(".preview")[0]);
 });
@@ -852,7 +962,7 @@ Offlog.registerView("Settings", function(view) {
      Begin NewPost.view.js
 ********************************************** */
 
-Offlog.registerView("NewPost", function() {
+Offlog.registerView("NewPost", function(view) {
 	Offlog.Template.render("new-post", Offlog.containers.main, {
 		"blog_context": function() {
 			var context = Offlog.config("blog_context");
@@ -867,7 +977,25 @@ Offlog.registerView("NewPost", function() {
 		"has_many_blogs": function() {
 			if((Offlog.config("blogs") || []).length > 1) return true;
 			else return false;
+		},
+
+		"draft_content": function() {
+			if(Offlog.config("current_draft")) {
+				return (new Offlog.List(Offlog.config("drafts"))).getItemById(Offlog.config("current_draft")).content;
+			}
+		},
+
+		"draft_title": function() {
+			if(Offlog.config("current_draft")) {
+				return (new Offlog.List(Offlog.config("drafts"))).getItemById(Offlog.config("current_draft")).title;
+			}
 		}
+	});
+
+	this.addEventListener(document.getElementById("post-new"), "click", function() {
+		Offlog.config("rm", "current_draft");
+
+		view.render();
 	});
 
 	this.addEventListener(document.getElementById("post-save"), "click", function() {
@@ -880,18 +1008,23 @@ Offlog.registerView("NewPost", function() {
 			if(!title) return new Offlog.Notification("error", "No Title", "Please supply a title before saving");
 
 			var article = new Offlog.Article(title, content);
-			article.save();
+			var id = article.save();
 
-			Offlog.config("current_draft", article.id);
-			return new Offlog.Notification("success", "Draft saved", "Draft successfully saved.");
+			Offlog.config("current_draft", id);
+
 		} else {
-			var article = Offlog.config("drafts")[Offlog.config("current_draft") - 1];
+			var drafts = new Offlog.List(Offlog.config("drafts"));
+			var article = drafts.getItemById(Offlog.config("current_draft"));
 
-			article.update({
-				title: title,
-				content: content
-			});
+			article.title = title;
+			article.content = content;
+			article.timestamp = (new Date()).toJSON();
+
+			drafts.updateItemById(article.id, article);
+			Offlog.config("drafts", drafts.toJSON());
 		}
+		
+		return new Offlog.Notification("success", "Draft saved", "Draft successfully saved.");
 	})
 
 	Offlog.main.resizeElement(this, document.getElementById("new-post-content"), 70);

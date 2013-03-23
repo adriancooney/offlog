@@ -1332,18 +1332,6 @@ body {
 #main-container[data-template="home"] .scroll-wrapper {
   overflow-y: scroll;
 }
-#main-container[data-template="home"] .no-blogs h4 {
-  font-size: 28px;
-  font-weight: bold;
-  text-align: center;
-  margin: 30px;
-  width: 100%;
-}
-#main-container[data-template="home"] .no-blogs p {
-  font-size: 14px;
-  text-align: center;
-  width: 100%;
-}
 #main-container[data-template="home"] article {
   height: 130px;
   margin: 16px;
@@ -1504,11 +1492,13 @@ body {
 #main-container[data-template="drafts"] .drafts-list .active .arrow {
   margin-right: -4px;
 }
-#main-container[data-template="drafts"] .toolbar {
+#main-container[data-template="drafts"] #toolbar {
   width: 100%;
   background: #272731;
+  height: 38px;
 }
-#main-container[data-template="drafts"] .toolbar button {
+#main-container[data-template="drafts"] #toolbar button {
+  float: right;
   font-size: 14px;
   width: auto;
   margin: 8px;
@@ -1519,9 +1509,26 @@ body {
   margin-right: 0;
   padding-right: 8px;
 }
-#main-container[data-template="drafts"] .toolbar button:last-child {
+#main-container[data-template="drafts"] #toolbar button:last-child {
   border-right: none;
   margin-left: 0;
+}
+#main-container[data-template="drafts"] #toolbar h4 {
+  color: rgba(255, 255, 255, 0.8);
+  padding: 10px;
+  font-size: 18px;
+}
+#main-container[data-template="drafts"] #toolbar.inactive button {
+  display: none;
+}
+#main-container[data-template="drafts"] .placeholder {
+  width: 100%;
+}
+#main-container[data-template="drafts"] .placeholder h1 {
+  font-size: 32px;
+  margin: 18px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
 }
 .row div {
   display: inline-block;
@@ -1859,6 +1866,22 @@ body {
   width: inherit;
   height: inherit;
   border: none;
+}
+.empty {
+  float: none !important;
+  display: block !important;
+}
+.empty h4 {
+  font-size: 28px;
+  font-weight: bold;
+  text-align: center;
+  margin: 30px;
+  width: 100%;
+}
+.empty p {
+  font-size: 14px;
+  text-align: center;
+  width: 100%;
 }
 .transition {
   -webkit-transition: 300ms all;

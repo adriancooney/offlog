@@ -31,7 +31,7 @@
 
 	<script type="text/template" data-id="new-post">
 		<div class="blog-bar">
-			<div class="controls"><i id="expand-blog-settings" class="icon-cog" alt="Show post settings"></i><i id="post-save" class="icon-save" alt="Save post as draft"></i><i id="post-publish" class="icon-signout" alt="Publish post"></i></div>
+			<div class="controls"><i id="expand-blog-settings" class="icon-cog" alt="Show post settings"></i><i id="post-new" class="icon-file-alt" alt="New Post"></i><i id="post-save" class="icon-save" alt="Save post as draft"></i><i id="post-publish" class="icon-signout" alt="Publish post"></i></div>
 			<h3><i class="icon-book type" alt="Current blog context"></i> {{blog_context}} 
 				{{#has_many_blogs}}
 					<i class="icon-caret-down"></i>
@@ -39,8 +39,8 @@
 			</h3>
 			<div class="blog-settings"></div>
 		</div>
-		<input type="text" placeholder="Post title.." id="new-post-title"/>
-		<textarea id="new-post-content"/></textarea>
+		<input type="text" placeholder="Post title.." value="{{draft_title}}" id="new-post-title"/>
+		<textarea id="new-post-content"/>{{draft_content}}</textarea>
 	</script>
 
 	<script type="text/template" data-id="home">
@@ -76,7 +76,7 @@
 				{{/blogs}}
 
 				{{#blogs_empty}}
-					<div class="no-blogs">
+					<div class="empty">
 						<h4>No blogs to show!</h4>
 						<p>To get started, hit <span class="inline-button"><i class="icon-plus"></i> New Blog</span> in the sidebar to create a new blog. Happy blogging!</p>
 					</div>
@@ -114,15 +114,24 @@
 			<div class="half">
 				<ul class="drafts-list">
 					{{#drafts}}
-					<li class="active"><i class="icon-file-alt draft-icon"></i><i class="icon-chevron-right arrow"></i><h4>{{draft_title}}</h4><h5>{{date}}</h5></li>
+					<li id="article-{{id}}"><i class="icon-file-alt draft-icon"></i><i class="icon-chevron-right arrow"></i><h4>{{title}}</h4><h5>{{date}}</h5></li>
 					{{/drafts}}
+
+					{{#drafts_empty}}
+						<div class="empty">
+							<h4>No drafts to show.</h4>
+							<p>To get writing, hit <span class="inline-button"><i class="icon-file-alt"></i> New Post</span> in the sidebar to create a new post.</p>
+						</div>
+					{{/drafts_empty}}
 				</ul>
 			</div>
 			<div class="half preview">
-				<div class="toolbar">
-					<button><i class="icon-pencil"></i> Continue Editing</button>
-					<button><i class="icon-trash"></i> Delete</button>
+				<div id="toolbar" class="inactive">
+					<button id="continue-editing-draft"><i class="icon-pencil"></i> Continue Editing</button>
+					<button id="delete-draft"><i class="icon-trash"></i> Delete</button>
+					<h4>Preview</h4>
 				</div>
+				<div class="placeholder"></div>
 			</div>
 		</div>
 	</script>
@@ -234,6 +243,7 @@
 <script src="lib/codemirror.js"></script>
 
 <script src="lib/markdown.js"></script>
+<script src="lib/humane.js"></script>
 
 <!-- Github Integration Library, frustrating that is has such large dependancies -->
 <script src="lib/github/lib/underscore-min.js"></script>

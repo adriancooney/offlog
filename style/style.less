@@ -334,22 +334,6 @@ body {
 		overflow-y: scroll;
 	}
 
-	.no-blogs {
-		h4 {
-			font-size: 28px;
-			font-weight: bold;
-			text-align: center;
-			margin: 30px;
-			width: 100%;
-		}
-
-		p {
-			font-size: 14px;
-			text-align: center;
-			width: 100%;
-		}
-	}
-
 	article {
 		height: 130px;
 		margin: 16px;
@@ -542,11 +526,13 @@ body {
 		}
 	}
 
-	.toolbar {
+	#toolbar {
 		width: 100%;
 		background: @sidebar_background_color;
+		height: 38px;
 
 		button {
+			float: right;
 			font-size: 14px;
 			width: auto;
 			margin: 8px;
@@ -561,6 +547,29 @@ body {
 		button:last-child {
 			border-right: none;
 			margin-left: 0;
+		}
+
+		h4 {
+			color: rgba(255, 255, 255, 0.8);
+			padding: 10px;
+			font-size: 18px;
+		}
+	}
+
+	#toolbar.inactive {
+		button {
+			display: none;
+		}
+	}
+
+	.placeholder {
+		width: 100%;
+		
+		h1 {
+			font-size: 32px;
+			margin: 18px;
+			padding: 6px 0;
+			border-bottom: 1px solid rgba(0,0,0,0.3);
 		}
 	}
 }
@@ -930,6 +939,25 @@ body {
 	width: inherit;
 	height: inherit;
 	border: none;
+}
+
+.empty {
+	float: none !important;
+	display: block !important;
+
+	h4 {
+		font-size: 28px;
+		font-weight: bold;
+		text-align: center;
+		margin: 30px;
+		width: 100%;
+	}
+
+	p {
+		font-size: 14px;
+		text-align: center;
+		width: 100%;
+	}
 }
 
 .transition { -webkit-transition: 300ms all;}
