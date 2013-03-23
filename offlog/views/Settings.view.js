@@ -1,4 +1,7 @@
-Offlog.registerView("Settings", function(view) {
+Offlog.registerView("Settings", ["author", "gh_integration"], function(view, data) {
+	var gh_integration = data.gh_integration,
+		author = data.author;
+
 
 	var notIntegrated = "<h4 class=\"integrated not\"><i class=\"icon-warning-sign\"></i> Github not integrated.</h4>";
 	var isIntegrated = "<h4 class=\"integrated\"><i class=\"icon-ok\"></i> Github integrated.</h4>";
@@ -7,10 +10,10 @@ Offlog.registerView("Settings", function(view) {
 
 
 	Offlog.Template.render("settings", Offlog.containers.main, {
-		"author": Offlog.config("author"),
-		"integration_text": Offlog.config("gh_integration") ? isIntegrated : notIntegrated,
-		"integration_disabled": Offlog.config("gh_integration") ? "disabled" : "",
-		"integration_actions": Offlog.config("gh_integration") ? actionDeauthorize : actionIntegrate
+		"author": author,
+		"integration_text": gh_integration ? isIntegrated : notIntegrated,
+		"integration_disabled": gh_integration ? "disabled" : "",
+		"integration_actions": gh_integration ? actionDeauthorize : actionIntegrate
 	});
 
 	this.addEventListener(document.getElementById("github-deauthorize"), "click", function() {
@@ -54,7 +57,6 @@ Offlog.registerView("Settings", function(view) {
 
 						//Set the user information
 						Offlog.Github.getAuthorInformation(function(user) {
-							console.log(user);
 							view.render();
 						});
 					} else new Offlog.Notification("error", "Invalid Credentials", "Please provide valid Github credentials.");

@@ -1,4 +1,7 @@
-Offlog.registerView("NewPost", function(view) {
+Offlog.registerView("NewPost", ["blogs", "blog_context"], function(view, data) {
+	var blogs = new Offlog.List(data.blogs),
+		blog_context = data.blog_context;
+
 	Offlog.Template.render("new-post", Offlog.containers.main, {
 		"blog_context": function() {
 			var context = Offlog.config("blog_context");
@@ -39,26 +42,30 @@ Offlog.registerView("NewPost", function(view) {
 		var title = document.getElementById("new-post-title").value,
 			content = document.getElementById("new-post-content").value;
 
-		if(!Offlog.config("current_draft")) {
-			//create a new article instance
-			if(!title) return new Offlog.Notification("error", "No Title", "Please supply a title before saving");
+		Offlog.config("current_draft", function(current_draft) {
+			if(!current_draft) {
+				//create a new article instance
+				if(!title) return new Offlog.Notification("error", "No Title", "Please supply a title before saving");
 
-			var article = new Offlog.Article(title, content);
-			var id = article.save();
+				var article = new Offlog.Article(title, content);
+				var id = article.save();
 
-			Offlog.config("current_draft", id);
+				Offlog.config("current_draft", id);
 
-		} else {
-			var drafts = new Offlog.List(Offlog.config("drafts"));
-			var article = drafts.getItemById(Offlog.config("current_draft"));
+			} else {
+				Offlog.config(["drafts", "current_draft"], function(data) {
+					var drafts = new Offlog.List(data.drafts);
+					var article = drafts.getItemById(data.current_draft);
 
-			article.title = title;
-			article.content = content;
-			article.timestamp = (new Date()).toJSON();
+					article.title = title;
+					article.content = content;
+					article.timestamp = (new Date()).toJSON();
 
-			drafts.updateItemById(article.id, article);
-			Offlog.config("drafts", drafts.toJSON());
-		}
+					drafts.updateItemById(article.id, article);
+					Offlog.config("drafts", drafts.toObject());
+				});
+			}
+		});
 		
 		return new Offlog.Notification("success", "Draft saved", "Draft successfully saved.");
 	})

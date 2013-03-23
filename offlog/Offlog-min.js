@@ -243,8 +243,9 @@ Offlog.Storage = {
 	"delete": function(arr) {
 		if(typeof arr == "string") arr = [arr];
 
+		var that = this;
 		arr.forEach(function(val) {
-			this.storage.remove(val);
+			that.storage.remove(val);
 		})
 	}
 };
@@ -778,8 +779,8 @@ Offlog.registerView("Drafts", ["drafts"], function(view, data) {
      Begin Home.view.js
 ********************************************** */
 
-Offlog.registerView("Home", function(view) {
-	var blogs = new Offlog.List(Offlog.config("blogs"));
+Offlog.registerView("Home", ["blogs"], function(view, data) {
+	var blogs = new Offlog.List(data.blogs);
 
 	Offlog.Template.render("home", Offlog.containers.main, {
 		blogs: blogs.list,
@@ -824,12 +825,13 @@ Offlog.registerView("Home", function(view) {
 		var that = this;
 		Offlog.confirm("Are you sure you want to delete this blog?", function() {
 			var id = that.parentNode.parentNode.getAttribute("data-blog");
+			Offlog.config("blog_context", function(blog_context) {
+				if(blog_context == id) Offlog.config("rm", "blog_context");
+				blogs.removeItemById(id);
+				Offlog.config("blogs", blogs.toObject());
 
-			if(Offlog.config("blog_context") == id) Offlog.config("rm", "blog_context");
-			blogs.removeItemById(id);
-			Offlog.config("blogs", blogs.toJSON());
-
-			view.render();
+				view.render();
+			});
 		});
 	});
 
@@ -932,14 +934,15 @@ Offlog.registerView("EditTheme", function() {
      Begin NewBlog.view.js
 ********************************************** */
 
-Offlog.registerView("NewBlog", function(view, data) {
+Offlog.registerView("NewBlog", ["blogs", "blog_context"], function(view, data) {
 	var editMode = (data) ? data.editMode : false,
-		blogs = new Offlog.List(Offlog.config("blogs"));
+		blogs = new Offlog.List(data.blogs),
+		blog_context = data.blog_context;
 
 
 	Offlog.Template.render("new-blog", Offlog.containers.main, {
 		action: editMode ? "Update" : "New",
-		blog: (editMode && Offlog.config("blog_context")) ? blogs.getItemById(Offlog.config("blog_context")) : {},
+		blog: (editMode && Offlog.config("blog_context")) ? blogs.getItemById(blog_context) : {},
 		button: editMode ? "Update" : "Submit"
 	});
 
@@ -980,10 +983,7 @@ Offlog.registerView("NewBlog", function(view, data) {
 			//Set it as the current blog
 			Offlog.config("blog_context", id);
 		} else {
-			var blogs = new Offlog.List(Offlog.config("blogs")),
-				blog = blogs.getItemById(Offlog.config("blog_context"));
-
-			console.log(blog);
+			var blog = blogs.getItemById(blog_context);
 
 			blog.title = values["name"];
 			blog.theme = values["theme"];
@@ -1004,7 +1004,10 @@ Offlog.registerView("NewBlog", function(view, data) {
      Begin Settings.view.js
 ********************************************** */
 
-Offlog.registerView("Settings", function(view) {
+Offlog.registerView("Settings", ["author", "gh_integration"], function(view, data) {
+	var gh_integration = data.gh_integration,
+		author = data.author;
+
 
 	var notIntegrated = "<h4 class=\"integrated not\"><i class=\"icon-warning-sign\"></i> Github not integrated.</h4>";
 	var isIntegrated = "<h4 class=\"integrated\"><i class=\"icon-ok\"></i> Github integrated.</h4>";
@@ -1013,10 +1016,10 @@ Offlog.registerView("Settings", function(view) {
 
 
 	Offlog.Template.render("settings", Offlog.containers.main, {
-		"author": Offlog.config("author"),
-		"integration_text": Offlog.config("gh_integration") ? isIntegrated : notIntegrated,
-		"integration_disabled": Offlog.config("gh_integration") ? "disabled" : "",
-		"integration_actions": Offlog.config("gh_integration") ? actionDeauthorize : actionIntegrate
+		"author": author,
+		"integration_text": gh_integration ? isIntegrated : notIntegrated,
+		"integration_disabled": gh_integration ? "disabled" : "",
+		"integration_actions": gh_integration ? actionDeauthorize : actionIntegrate
 	});
 
 	this.addEventListener(document.getElementById("github-deauthorize"), "click", function() {
@@ -1060,7 +1063,6 @@ Offlog.registerView("Settings", function(view) {
 
 						//Set the user information
 						Offlog.Github.getAuthorInformation(function(user) {
-							console.log(user);
 							view.render();
 						});
 					} else new Offlog.Notification("error", "Invalid Credentials", "Please provide valid Github credentials.");
@@ -1092,7 +1094,10 @@ Offlog.registerView("Settings", function(view) {
      Begin NewPost.view.js
 ********************************************** */
 
-Offlog.registerView("NewPost", function(view) {
+Offlog.registerView("NewPost", ["blogs", "blog_context"], function(view, data) {
+	var blogs = new Offlog.List(data.blogs),
+		blog_context = data.blog_context;
+
 	Offlog.Template.render("new-post", Offlog.containers.main, {
 		"blog_context": function() {
 			var context = Offlog.config("blog_context");
@@ -1133,26 +1138,30 @@ Offlog.registerView("NewPost", function(view) {
 		var title = document.getElementById("new-post-title").value,
 			content = document.getElementById("new-post-content").value;
 
-		if(!Offlog.config("current_draft")) {
-			//create a new article instance
-			if(!title) return new Offlog.Notification("error", "No Title", "Please supply a title before saving");
+		Offlog.config("current_draft", function(current_draft) {
+			if(!current_draft) {
+				//create a new article instance
+				if(!title) return new Offlog.Notification("error", "No Title", "Please supply a title before saving");
 
-			var article = new Offlog.Article(title, content);
-			var id = article.save();
+				var article = new Offlog.Article(title, content);
+				var id = article.save();
 
-			Offlog.config("current_draft", id);
+				Offlog.config("current_draft", id);
 
-		} else {
-			var drafts = new Offlog.List(Offlog.config("drafts"));
-			var article = drafts.getItemById(Offlog.config("current_draft"));
+			} else {
+				Offlog.config(["drafts", "current_draft"], function(data) {
+					var drafts = new Offlog.List(data.drafts);
+					var article = drafts.getItemById(data.current_draft);
 
-			article.title = title;
-			article.content = content;
-			article.timestamp = (new Date()).toJSON();
+					article.title = title;
+					article.content = content;
+					article.timestamp = (new Date()).toJSON();
 
-			drafts.updateItemById(article.id, article);
-			Offlog.config("drafts", drafts.toJSON());
-		}
+					drafts.updateItemById(article.id, article);
+					Offlog.config("drafts", drafts.toObject());
+				});
+			}
+		});
 		
 		return new Offlog.Notification("success", "Draft saved", "Draft successfully saved.");
 	})

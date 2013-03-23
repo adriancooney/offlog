@@ -1,11 +1,12 @@
-Offlog.registerView("NewBlog", function(view, data) {
+Offlog.registerView("NewBlog", ["blogs", "blog_context"], function(view, data) {
 	var editMode = (data) ? data.editMode : false,
-		blogs = new Offlog.List(Offlog.config("blogs"));
+		blogs = new Offlog.List(data.blogs),
+		blog_context = data.blog_context;
 
 
 	Offlog.Template.render("new-blog", Offlog.containers.main, {
 		action: editMode ? "Update" : "New",
-		blog: (editMode && Offlog.config("blog_context")) ? blogs.getItemById(Offlog.config("blog_context")) : {},
+		blog: (editMode && Offlog.config("blog_context")) ? blogs.getItemById(blog_context) : {},
 		button: editMode ? "Update" : "Submit"
 	});
 
@@ -46,10 +47,7 @@ Offlog.registerView("NewBlog", function(view, data) {
 			//Set it as the current blog
 			Offlog.config("blog_context", id);
 		} else {
-			var blogs = new Offlog.List(Offlog.config("blogs")),
-				blog = blogs.getItemById(Offlog.config("blog_context"));
-
-			console.log(blog);
+			var blog = blogs.getItemById(blog_context);
 
 			blog.title = values["name"];
 			blog.theme = values["theme"];

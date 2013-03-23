@@ -243,8 +243,9 @@ Offlog.Storage = {
 	"delete": function(arr) {
 		if(typeof arr == "string") arr = [arr];
 
+		var that = this;
 		arr.forEach(function(val) {
-			this.storage.remove(val);
+			that.storage.remove(val);
 		})
 	}
 };

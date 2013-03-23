@@ -1,5 +1,5 @@
-Offlog.registerView("Home", function(view) {
-	var blogs = new Offlog.List(Offlog.config("blogs"));
+Offlog.registerView("Home", ["blogs"], function(view, data) {
+	var blogs = new Offlog.List(data.blogs);
 
 	Offlog.Template.render("home", Offlog.containers.main, {
 		blogs: blogs.list,
@@ -44,12 +44,13 @@ Offlog.registerView("Home", function(view) {
 		var that = this;
 		Offlog.confirm("Are you sure you want to delete this blog?", function() {
 			var id = that.parentNode.parentNode.getAttribute("data-blog");
+			Offlog.config("blog_context", function(blog_context) {
+				if(blog_context == id) Offlog.config("rm", "blog_context");
+				blogs.removeItemById(id);
+				Offlog.config("blogs", blogs.toObject());
 
-			if(Offlog.config("blog_context") == id) Offlog.config("rm", "blog_context");
-			blogs.removeItemById(id);
-			Offlog.config("blogs", blogs.toJSON());
-
-			view.render();
+				view.render();
+			});
 		});
 	});
 
