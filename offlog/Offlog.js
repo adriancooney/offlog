@@ -4,7 +4,7 @@ var Offlog = {
 		main: document.getElementById("main-container")
 	},
 
-	defaultView: "Drafts",
+	defaultView: "Welcome",
 
 	views: {},
 
@@ -103,6 +103,25 @@ var Offlog = {
 		this.renderView(this.defaultView);
 	},
 
+	confirm: function(msg, confrm, cancel) {
+		var HTML = "<article class=\"confirm\"><i class=\"icon-question-sign\"></i><h4>" + msg + "</h4><p><button id=\"confirm\">Confirm</button><button id=\"cancel\">Cancel</button></p></article>";
+
+		var modal = new Offlog.Modal(HTML, 400, 240);
+
+		document.getElementById("confirm").addEventListener("click", function() {
+			confrm();
+
+			modal.die();
+		});
+
+		document.getElementById("cancel").addEventListener("click", function() {
+			if(cancel) cancel();
+
+			modal.die();
+		});
+
+	},
+
 	working: function(bool) {
 		if(bool) document.getElementById("working").classList.remove("inactive")
 		else document.getElementById("working").classList.add("inactive");
@@ -112,16 +131,16 @@ var Offlog = {
 		this.views[view] = new Offlog.View(view, init, die);
 	},
 
-	renderView: function(view) {
+	renderView: function(view, data) {
 		var that = this;
 		if(!this.views[view]) console.log("View '" + view + "' not found.");
 		else {
 			if(this.currentView) this.views[this.currentView].die(), this.views[this.currentView].transition("fadeTop", "out", function() {
-				that.views[view].render();
+				that.views[view].render(data);
 				that.views[view].transition("fadeTop", "in", function() {
 					that.currentView = view;
 				});
-			}); else this.views[view].render(), this.currentView = view;
+			}); else this.views[view].render(data), this.currentView = view;
 		}
 	}
 };
@@ -139,8 +158,8 @@ Offlog.View = function(name, init, die) {
 	this.events = [];
 };
 
-Offlog.View.prototype.render = function() {
-	this._init.call(this, this);
+Offlog.View.prototype.render = function(data) {
+	this._init.call(this, this, data);
 	this.bindEvents();
 };
 
@@ -484,7 +503,6 @@ Offlog.Filesystem = {
 Offlog.Blog = function(options) {
 	this.blog = (function(merge) {
 		var defaults = {
-			id: (Offlog.config("blogs") || []).length + 1,
 			theme: "default",
 			articles: [],
 			timestamp: new Date().toJSON()
@@ -508,28 +526,16 @@ Offlog.Blog.prototype.compile = function() {
 
 };
 
-Offlog.Blog.prototype.newArticle = function(data) {
-	data = (function(data) {
-		var defaults = {
-			published: false
-		};
-
-		for(var key in defaults) if(!data[key]) data[key] = defaults[key];
-
-		return data;
-	})(data);
-
-	console.log(data);
-};
-
 Offlog.Blog.prototype.getTheme = function(theme) {
 	return exampleTheme;
 };
 
 Offlog.Blog.prototype.save = function() {
-	var blogs = Offlog.config("blogs") || [];
-	blogs.push(this.blog)
-	Offlog.config("blogs", blogs);
+	var blogs = new Offlog.List(Offlog.config("blogs"));
+	blogs.addItem(this.blog)
+	Offlog.config("blogs", blogs.toJSON());
+
+	return blogs.id;
 };
 
 /**

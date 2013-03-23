@@ -4,7 +4,7 @@ var Offlog = {
 		main: document.getElementById("main-container")
 	},
 
-	defaultView: "Drafts",
+	defaultView: "Welcome",
 
 	views: {},
 
@@ -103,6 +103,25 @@ var Offlog = {
 		this.renderView(this.defaultView);
 	},
 
+	confirm: function(msg, confrm, cancel) {
+		var HTML = "<article class=\"confirm\"><i class=\"icon-question-sign\"></i><h4>" + msg + "</h4><p><button id=\"confirm\">Confirm</button><button id=\"cancel\">Cancel</button></p></article>";
+
+		var modal = new Offlog.Modal(HTML, 400, 240);
+
+		document.getElementById("confirm").addEventListener("click", function() {
+			confrm();
+
+			modal.die();
+		});
+
+		document.getElementById("cancel").addEventListener("click", function() {
+			if(cancel) cancel();
+
+			modal.die();
+		});
+
+	},
+
 	working: function(bool) {
 		if(bool) document.getElementById("working").classList.remove("inactive")
 		else document.getElementById("working").classList.add("inactive");
@@ -112,16 +131,16 @@ var Offlog = {
 		this.views[view] = new Offlog.View(view, init, die);
 	},
 
-	renderView: function(view) {
+	renderView: function(view, data) {
 		var that = this;
 		if(!this.views[view]) console.log("View '" + view + "' not found.");
 		else {
 			if(this.currentView) this.views[this.currentView].die(), this.views[this.currentView].transition("fadeTop", "out", function() {
-				that.views[view].render();
+				that.views[view].render(data);
 				that.views[view].transition("fadeTop", "in", function() {
 					that.currentView = view;
 				});
-			}); else this.views[view].render(), this.currentView = view;
+			}); else this.views[view].render(data), this.currentView = view;
 		}
 	}
 };
@@ -139,8 +158,8 @@ Offlog.View = function(name, init, die) {
 	this.events = [];
 };
 
-Offlog.View.prototype.render = function() {
-	this._init.call(this, this);
+Offlog.View.prototype.render = function(data) {
+	this._init.call(this, this, data);
 	this.bindEvents();
 };
 
@@ -484,7 +503,6 @@ Offlog.Filesystem = {
 Offlog.Blog = function(options) {
 	this.blog = (function(merge) {
 		var defaults = {
-			id: (Offlog.config("blogs") || []).length + 1,
 			theme: "default",
 			articles: [],
 			timestamp: new Date().toJSON()
@@ -508,28 +526,16 @@ Offlog.Blog.prototype.compile = function() {
 
 };
 
-Offlog.Blog.prototype.newArticle = function(data) {
-	data = (function(data) {
-		var defaults = {
-			published: false
-		};
-
-		for(var key in defaults) if(!data[key]) data[key] = defaults[key];
-
-		return data;
-	})(data);
-
-	console.log(data);
-};
-
 Offlog.Blog.prototype.getTheme = function(theme) {
 	return exampleTheme;
 };
 
 Offlog.Blog.prototype.save = function() {
-	var blogs = Offlog.config("blogs") || [];
-	blogs.push(this.blog)
-	Offlog.config("blogs", blogs);
+	var blogs = new Offlog.List(Offlog.config("blogs"));
+	blogs.addItem(this.blog)
+	Offlog.config("blogs", blogs.toJSON());
+
+	return blogs.id;
 };
 
 /**
@@ -723,13 +729,17 @@ Offlog.registerView("Drafts", function(view) {
 	})
 
 	this.addEventListener(document.getElementById("delete-draft"), "click", function() {
-		var id = parseInt(placeholder.getAttribute("data-article"));
 
-		if(Offlog.config("current_draft") == id) Offlog.config("rm", "current_draft");
-		drafts.removeItemById(id);
-		Offlog.config("drafts", drafts.toJSON());
+		Offlog.confirm("Are you sure you want to delete this draft?", function() {
+			var id = parseInt(placeholder.getAttribute("data-article"));
 
-		view.render();
+			if(Offlog.config("current_draft") == id) Offlog.config("rm", "current_draft");
+			drafts.removeItemById(id);
+			Offlog.config("drafts", drafts.toJSON());
+
+			view.render();
+		});
+		
 	})
 
 	Offlog.main.resizeElement(this, document.querySelectorAll(".preview")[0]);
@@ -739,9 +749,11 @@ Offlog.registerView("Drafts", function(view) {
      Begin Home.view.js
 ********************************************** */
 
-Offlog.registerView("Home", function() {
+Offlog.registerView("Home", function(view) {
+	var blogs = new Offlog.List(Offlog.config("blogs"));
+
 	Offlog.Template.render("home", Offlog.containers.main, {
-		blogs: Offlog.config("blogs") || [],
+		blogs: blogs.list,
 		"description_formatted": function() {
 			if(!this.description) return "No description."
 			else return this.description;
@@ -769,6 +781,34 @@ Offlog.registerView("Home", function() {
 			else false;
 		}
 	});
+
+	//Bind to those blog buttons
+	bindToMany(document.getElementsByClassName("edit-blog-settings"), "click", function() {
+		var id = this.parentNode.parentNode.getAttribute("data-blog");
+
+		Offlog.config("blog_context", id);
+
+		Offlog.renderView("NewBlog", {editMode: true})
+	});
+
+	bindToMany(document.getElementsByClassName("delete-blog"), "click", function() {
+		var that = this;
+		Offlog.confirm("Are you sure you want to delete this blog?", function() {
+			var id = that.parentNode.parentNode.getAttribute("data-blog");
+
+			if(Offlog.config("blog_context") == id) Offlog.config("rm", "blog_context");
+			blogs.removeItemById(id);
+			Offlog.config("blogs", blogs.toJSON());
+
+			view.render();
+		});
+	});
+
+	function bindToMany(nodes, event, callback) {
+		Array.prototype.forEach.call(nodes, function(n) {
+			n.addEventListener(event, callback);
+		})
+	}
 
 	//Set the overflow height
 	Offlog.main.resizeElement(this, document.querySelectorAll(".scroll-wrapper")[0]);
@@ -800,7 +840,7 @@ Offlog.registerView("Home", function() {
 		if(lyrics[phraseCount]) Offlog.Console.append(lyrics[phraseCount]), phraseCount++;
 	});
 
-	Offlog.Console.append("")
+	Offlog.Console.append("");
 });
 
 /* **********************************************
@@ -835,8 +875,16 @@ Offlog.registerView("EditTheme", function() {
      Begin NewBlog.view.js
 ********************************************** */
 
-Offlog.registerView("NewBlog", function() {
-	Offlog.Template.render("new-blog", Offlog.containers.main);
+Offlog.registerView("NewBlog", function(view, data) {
+	var editMode = (data) ? data.editMode : false,
+		blogs = new Offlog.List(Offlog.config("blogs"));
+
+
+	Offlog.Template.render("new-blog", Offlog.containers.main, {
+		action: editMode ? "Update" : "New",
+		blog: (editMode && Offlog.config("blog_context")) ? blogs.getItemById(Offlog.config("blog_context")) : {},
+		button: editMode ? "Update" : "Submit"
+	});
 
 	this.addEventListener(document.getElementById("action-newblog"), "click", function(e) {
 		var form = document.getElementById("create-blog"),
@@ -859,20 +907,37 @@ Offlog.registerView("NewBlog", function() {
 		var blogs = Offlog.config("blogs") || [];
 		for(var i = 0; i < blogs.length; i++) if(blogs[i].root_location == values["root_location"]) return new Offlog.Notification("error", "Root location not unique", "That root location is already in use on blog '" + blogs[i].title + "'.");
 
-		//Inputs sanitized
-		var blog =  new Offlog.Blog({
-			title: values["name"],
-			theme: values["theme"],
-			root_location: values["root_location"],
-			description: values["description"]
-		})
+		if(!editMode) {
+			//Inputs sanitized
+			var blog =  new Offlog.Blog({
+				title: values["name"],
+				theme: values["theme"],
+				root_location: values["root_location"],
+				description: values["description"]
+			})
 
-		blog.save();
+			var id = blog.save();
 
-		new Offlog.Notification("success", "Successfully created blog", "Successfully created blog '" + values["name"] + "'");
+			new Offlog.Notification("success", "Successfully created blog", "Successfully created blog '" + values["name"] + "'");
 
-		//Set it as the current blog
-		Offlog.config("blog_context", blog.blog.id);
+			//Set it as the current blog
+			Offlog.config("blog_context", id);
+		} else {
+			var blogs = new Offlog.List(Offlog.config("blogs")),
+				blog = blogs.getItemById(Offlog.config("blog_context"));
+
+			console.log(blog);
+
+			blog.title = values["name"];
+			blog.theme = values["theme"];
+			blog.root_location = values["root_location"];
+			blog.description = values["description"];
+
+			blogs.updateItemById(blog.id, blog);
+
+			new Offlog.Notification("success", "Successfully updated blog", "Successfully updated blog '" + values["name"] + "'");
+
+		}
 
 		Offlog.renderView("Home");
 	})
@@ -970,7 +1035,7 @@ Offlog.registerView("NewPost", function(view) {
 			if(context) {
 				return Offlog.config("blogs")[context - 1].title;
 			} else {
-				return "No Blogs."
+				return "No blog selected."
 			}
 		},
 

@@ -46,13 +46,17 @@ Offlog.registerView("Drafts", function(view) {
 	})
 
 	this.addEventListener(document.getElementById("delete-draft"), "click", function() {
-		var id = parseInt(placeholder.getAttribute("data-article"));
 
-		if(Offlog.config("current_draft") == id) Offlog.config("rm", "current_draft");
-		drafts.removeItemById(id);
-		Offlog.config("drafts", drafts.toJSON());
+		Offlog.confirm("Are you sure you want to delete this draft?", function() {
+			var id = parseInt(placeholder.getAttribute("data-article"));
 
-		view.render();
+			if(Offlog.config("current_draft") == id) Offlog.config("rm", "current_draft");
+			drafts.removeItemById(id);
+			Offlog.config("drafts", drafts.toJSON());
+
+			view.render();
+		});
+		
 	})
 
 	Offlog.main.resizeElement(this, document.querySelectorAll(".preview")[0]);

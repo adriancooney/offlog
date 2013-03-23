@@ -1387,7 +1387,7 @@ body {
   color: #325671;
   cursor: pointer;
 }
-#main-container[data-template="home"] article .actions i:nth-child(3) {
+#main-container[data-template="home"] article .actions i:nth-child(4) {
   font-size: 22px;
 }
 #main-container[data-template="home"] #console {
@@ -1509,7 +1509,7 @@ body {
   margin-right: 0;
   padding-right: 8px;
 }
-#main-container[data-template="drafts"] #toolbar button:last-child {
+#main-container[data-template="drafts"] #toolbar #continue-editing-draft {
   border-right: none;
   margin-left: 0;
 }
@@ -1877,11 +1877,44 @@ body {
   text-align: center;
   margin: 30px;
   width: 100%;
+  margin-left: 0;
 }
 .empty p {
   font-size: 14px;
   text-align: center;
   width: 100%;
+  margin-left: 0;
+  padding: 0;
+}
+.confirm {
+  text-align: center;
+}
+.confirm i {
+  font-size: 80px;
+  color: rgba(0, 0, 0, 0.1);
+  margin-top: 12px;
+  display: inline-block;
+}
+.confirm h4 {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 20px 0 30px;
+}
+.confirm p {
+  width: 100%;
+  background: #7099b7;
+  padding: 8px 0;
+}
+.confirm button {
+  border: none;
+  width: 90px;
+  background: #272730;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.3);
+  color: #a3a3c7;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: 4px;
 }
 .transition {
   -webkit-transition: 300ms all;

@@ -6,7 +6,7 @@ Offlog.registerView("NewPost", function(view) {
 			if(context) {
 				return Offlog.config("blogs")[context - 1].title;
 			} else {
-				return "No Blogs."
+				return "No blog selected."
 			}
 		},
 

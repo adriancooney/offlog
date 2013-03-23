@@ -1,6 +1,8 @@
-Offlog.registerView("Home", function() {
+Offlog.registerView("Home", function(view) {
+	var blogs = new Offlog.List(Offlog.config("blogs"));
+
 	Offlog.Template.render("home", Offlog.containers.main, {
-		blogs: Offlog.config("blogs") || [],
+		blogs: blogs.list,
 		"description_formatted": function() {
 			if(!this.description) return "No description."
 			else return this.description;
@@ -28,6 +30,34 @@ Offlog.registerView("Home", function() {
 			else false;
 		}
 	});
+
+	//Bind to those blog buttons
+	bindToMany(document.getElementsByClassName("edit-blog-settings"), "click", function() {
+		var id = this.parentNode.parentNode.getAttribute("data-blog");
+
+		Offlog.config("blog_context", id);
+
+		Offlog.renderView("NewBlog", {editMode: true})
+	});
+
+	bindToMany(document.getElementsByClassName("delete-blog"), "click", function() {
+		var that = this;
+		Offlog.confirm("Are you sure you want to delete this blog?", function() {
+			var id = that.parentNode.parentNode.getAttribute("data-blog");
+
+			if(Offlog.config("blog_context") == id) Offlog.config("rm", "blog_context");
+			blogs.removeItemById(id);
+			Offlog.config("blogs", blogs.toJSON());
+
+			view.render();
+		});
+	});
+
+	function bindToMany(nodes, event, callback) {
+		Array.prototype.forEach.call(nodes, function(n) {
+			n.addEventListener(event, callback);
+		})
+	}
 
 	//Set the overflow height
 	Offlog.main.resizeElement(this, document.querySelectorAll(".scroll-wrapper")[0]);
@@ -59,5 +89,5 @@ Offlog.registerView("Home", function() {
 		if(lyrics[phraseCount]) Offlog.Console.append(lyrics[phraseCount]), phraseCount++;
 	});
 
-	Offlog.Console.append("")
+	Offlog.Console.append("");
 });
