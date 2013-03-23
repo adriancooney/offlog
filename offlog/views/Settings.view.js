@@ -72,4 +72,12 @@ Offlog.registerView("Settings", function(view) {
 			document.getElementById("load").classList.add("inactive");
 		}
 	});
+
+	Array.prototype.forEach.call(document.querySelectorAll("input[type=text], textarea"), function(input) {
+		input.addEventListener("keydown", function(key) {
+			if(key.which == 13) {
+				
+			}
+		})
+	});
 });

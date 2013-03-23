@@ -1,5 +1,6 @@
-Offlog.registerView("Drafts", function(view) {
-	var drafts = new Offlog.List(Offlog.config("drafts"));
+Offlog.registerView("Drafts", ["drafts"], function(view, data) {
+	var drafts = new Offlog.List(data.drafts)
+
 	Offlog.Template.render("drafts", Offlog.containers.main, {
 		drafts: drafts.list,
 
@@ -50,11 +51,13 @@ Offlog.registerView("Drafts", function(view) {
 		Offlog.confirm("Are you sure you want to delete this draft?", function() {
 			var id = parseInt(placeholder.getAttribute("data-article"));
 
-			if(Offlog.config("current_draft") == id) Offlog.config("rm", "current_draft");
-			drafts.removeItemById(id);
-			Offlog.config("drafts", drafts.toJSON());
+			Offlog.config("current_draft", function(current_draft) {
+				if(current_draft == id) Offlog.config("rm", "current_draft");
+				drafts.removeItemById(id);
+				Offlog.config("drafts", drafts.toObject());
 
-			view.render();
+				view.render();
+			});
 		});
 		
 	})

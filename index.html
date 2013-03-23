@@ -188,7 +188,17 @@
 		<div class="blog-bar">
 			<h3><i class="icon-tint type"></i> Edit Theme</h3>
 		</div>
-		<div id="codemirror"></div>
+		<div class="editing">
+			<div class="expandable">
+				<div id="grab" onselectstart="return false;"></div>
+				<div id="theme-preview">
+					<iframe src="http://time.is"></iframe>
+				</div>
+			</div>
+			<div class="stuck">
+				<div id="codemirror"></div>
+			</div>
+		</div>
 	</script>
 
 	<script type="text/template" data-id="settings">
@@ -250,6 +260,12 @@
 
 <script src="lib/markdown.js"></script>
 <script src="lib/humane.js"></script>
+<script src="lib/humane.js"></script>
+
+<!-- Zip.js -->
+<script src="lib/zip.js/WebContent/zip.js"></script>
+<script src="lib/zip.js/WebContent/zip-fs.js"></script>
+<script src="lib/zip.js/WebContent/mime-types.js"></script>
 
 <!-- Github Integration Library, frustrating that is has such large dependancies -->
 <script src="lib/github/lib/underscore-min.js"></script>

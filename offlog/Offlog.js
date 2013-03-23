@@ -4,7 +4,7 @@ var Offlog = {
 		main: document.getElementById("main-container")
 	},
 
-	defaultView: "Welcome",
+	defaultView: "Settings",
 
 	views: {},
 
@@ -127,8 +127,9 @@ var Offlog = {
 		else document.getElementById("working").classList.add("inactive");
 	},
 
-	registerView: function(view, init, die) {
-		this.views[view] = new Offlog.View(view, init, die);
+	registerView: function(view, config_vars, init, die) {
+		if(typeof config_vars == "function") die = init, init = config_vars;
+		this.views[view] = new Offlog.View(view, config_vars, init, die);
 	},
 
 	renderView: function(view, data) {
@@ -151,16 +152,32 @@ var Offlog = {
  * @param {function} init Constructor function
  * @param {function} die  Destroy function
  */
-Offlog.View = function(name, init, die) {
+Offlog.View = function(name, config_vars, init, die) {
+	if(name == "Drafts") console.log("Creating View: ", name, config_vars, init, die);
+
 	this.name = name;
+	this.config_vars = config_vars;
 	this._init = init;
 	this._die = die || function() {};
 	this.events = [];
 };
 
 Offlog.View.prototype.render = function(data) {
-	this._init.call(this, this, data);
-	this.bindEvents();
+	data = data || {};
+	//get some configuration variables if any 
+	if(this.config_vars) {
+		var that = this;
+		Offlog.config(this.config_vars, function(vars) {
+			//Merge the data with vars
+			for(var key in vars) data[key] = vars[key];
+
+			that._init.call(that, that, data);
+			that.bindEvents();
+		})
+	} else {
+		this._init.call(this, this, data);
+		this.bindEvents();
+	}
 };
 
 Offlog.View.prototype.die = function() {
@@ -209,24 +226,26 @@ Offlog.View.prototype.transition = function(transition, inOrOut, callback) {
  * @type {Object}
  */
 Offlog.Storage = {
+	storage: (chrome && chrome.storage) ? chrome.storage.local : {},
 	"set": function(name, val) {
-		window.localStorage.setItem(name, JSON.stringify(val));
+		var o = {};
+		o[name] = val;
+		this.storage.set(o);
 	},
 
-	"get": function(name) {
-		if(this.exists(name)) return JSON.parse(window.localStorage.getItem(name));
+	"get": function(names, callback) {
+		return this.storage.get(names, function(vals) {
+			if(typeof names == "string") callback.call(this, vals[names]);
+			else callback.apply(this, arguments);
+		});
 	},
 
 	"delete": function(arr) {
 		if(typeof arr == "string") arr = [arr];
 
 		arr.forEach(function(val) {
-			window.localStorage.removeItem(val);
+			this.storage.remove(val);
 		})
-	},
-
-	exists: function(name) {
-		return !!window.localStorage.key(name);
 	}
 };
 
@@ -240,8 +259,8 @@ Offlog.config = function(name, val) {
 
 	name = "config_" + name;
 
-	if(name && val) return Offlog.Storage.set(name, val);
-	else return Offlog.Storage.get(name);
+	if(name && typeof val !== "function") return Offlog.Storage.set(name, val);
+	else return Offlog.Storage.get(name, val);
 };
 
 Offlog.Github = {
@@ -466,7 +485,7 @@ Offlog.Console = {
 }
 
 Offlog.Filesystem = {
-	fs: (function() {
+	/*fs: (function() {
 		webkitStorageInfo.requestQuota(window.PERSISTENT, 1024 * 1024, function(availableBytes) {
 				console.log(availableBytes);
 				window.webkitRequestFileSystem(window.PERSISTENT, 5 * 1024 * 1024, function(tfs) {
@@ -475,7 +494,7 @@ Offlog.Filesystem = {
 				});
 		 	}
 		);
-	})(),
+	})(),*/
 
 	moveContext: function() {
 		chrome.fileSystem.chooseEntry({ type: 'openFile' }, function() { console.log(arguments); });
@@ -533,7 +552,7 @@ Offlog.Blog.prototype.getTheme = function(theme) {
 Offlog.Blog.prototype.save = function() {
 	var blogs = new Offlog.List(Offlog.config("blogs"));
 	blogs.addItem(this.blog)
-	Offlog.config("blogs", blogs.toJSON());
+	Offlog.config("blogs", blogs.toObject());
 
 	return blogs.id;
 };
@@ -555,7 +574,7 @@ Offlog.Article = function(title, text) {
 Offlog.Article.prototype.save = function() {
 	var drafts = new Offlog.List(Offlog.config("drafts"));
 	var item = drafts.addItem(this.article);
-	Offlog.config("drafts", drafts.toJSON());
+	Offlog.config("drafts", drafts.toObject());
 
 	return item.id;
 };
@@ -591,6 +610,13 @@ Offlog.List.prototype.toJSON = function() {
 		list: this.list,
 		lastInsertId: this.lastInsertId
 	});
+};
+
+Offlog.List.prototype.toObject = function() {
+	return {
+		list: this.list,
+		lastInsertId: this.lastInsertId
+	};
 };
 
 Offlog.List.prototype.addItem = function(data) {

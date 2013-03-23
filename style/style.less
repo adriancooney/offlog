@@ -328,6 +328,56 @@ body {
 
 }
 
+#main-container[data-template="edit-theme"] {
+	.editing {
+		overflow-x: hidden;
+		position: relative;
+
+		.stuck {
+			width: 65%;
+			height: inherit;
+			position: relative;
+			z-index: 1;
+		}
+
+		.expandable {
+			height: inherit;
+			width: 54%;
+			background: #272730;
+			width: 980px;
+			position: absolute;
+			z-index: 2;
+			margin-left: 46%;
+
+			#grab {
+				height: inherit;
+				width: 20px;
+				background: #365b75;
+				cursor: w-resize;
+				float: left;
+				display: inline-block;
+			}
+
+			#theme-preview {
+				float: left;
+				display: inline-block;
+				height: inherit;
+				overflow: scroll;
+
+				iframe {
+					width: 940px;
+					height: 1600px;
+					margin: 10px;
+				}
+			}
+		}
+	}
+
+	.codemirror {
+		height: inherit !important;
+	}
+}
+
 
 #main-container[data-template="home"] {
 	.scroll-wrapper {

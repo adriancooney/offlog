@@ -18,6 +18,7 @@
     "clipboardRead",
     "clipboardWrite",
     "unlimitedStorage",
+    "storage",
     {
       "fileSystem": ["write"]
     }

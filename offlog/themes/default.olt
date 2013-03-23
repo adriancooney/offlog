@@ -75,12 +75,23 @@
 		<h1>{{blog_title}}</h1>
 	</header>
 
-	{{#article}}
-		<article>
-			<h1><span>{{article_date}}<br><em>{{article_month}}</em></span>{{article_title}}</h1>
-			{{article_content}}
-		</article>
-	{{/article}}
+	{{#is_index}}
+		{{#article}}
+			<article>
+				<h1><span>{{article_date}}<br><em>{{article_month}}</em></span>{{article_title}}</h1>
+				{{article_content}}
+				<a href="{{article_link}}">Continue Reading</a>
+			</article>
+		{{/article}}
+	{{/is_index}}
+
+	{{#is_article}}
+	<!-- Single article-->
+		{{article.title}}
+
+	{{/is_article}}
+
+
 	<footer>
 		<p>&copy; {{date.year}} {{author_name}}</p>
 	</footer>
