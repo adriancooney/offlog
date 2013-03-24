@@ -222,48 +222,54 @@ Offlog.View.prototype.transition = function(transition, inOrOut, callback) {
 	}
 };
 
-/**
- * Offlog localStorage API. Simple stuff
- * @type {Object}
- */
 Offlog.Storage = {
-	storage: (chrome && chrome.storage) ? chrome.storage.local : {},
-	"set": function(name, val) {
-		var o = {};
-		o[name] = val;
-		this.storage.set(o);
-	},
+	api: chrome.storage.local,
+	_prefix: "offlog_",
 
-	"get": function(names, callback) {
-		return this.storage.get(names, callback);
-	},
-
-	"delete": function(arr) {
-		if(typeof arr == "string") arr = [arr];
-
+	prefix: function(o, f) {
 		var that = this;
-		arr.forEach(function(val) {
-			that.storage.remove(val);
-		})
+		if(o instanceof Array) o.map(function(v) { return f(v); });
+		else if(o instanceof Object) { var n = {}; for(var key in o) n[f(key)] = o[key]; o = n; }
+		else if(typeof o == "string") o = f(o); //Hrm, "" instanceof String == false
+
+		return o;
+	},
+
+	addPrefix: function(obj) {
+		var prefix = this._prefix;
+		return this.prefix(obj, function(key) {
+			return prefix + key;
+		});
+	},
+
+	removePrefix: function(obj) {
+		var prefix = this._prefix;
+		return this.prefix(obj, function(key) {
+			return key.replace(prefix, "");
+		});
+	},
+
+	"get": function(name, callback) {
+		var that = this;
+		this.api.get(that.addPrefix(name), function(data) {
+			callback(that.removePrefix(data));
+		});
+	},
+
+	"set": function(name, value, callback) {
+		if(typeof value == "function") callback = value, value = undefined;
+
+		//Storage only takes objects
+		if(typeof name == "string" && value) {
+			var c = {};
+			c[name] = value;
+			name = c;
+		}
+
+		console.log(name);
+
+		this.api.set(this.addPrefix(name), callback);
 	}
-};
-
-Offlog.config = function(name, val) {
-	if(name == "rm" || name == "delete" || name == "remove") {
-		if(typeof val !== "string") val = val.map(function(v) { return "config_" + v; })
-		else val = "config_" + val;
-
-		return Offlog.Storage.delete(val);
-	}
-
-	name = "config_" + name;
-
-	if(name && typeof val !== "function") return Offlog.Storage.set(name, val);
-	else return Offlog.Storage.get(name, function(data) {
-		var f = {};
-		for(var key in data) f[key.replace("config_", "")] = data[key];
-		val(f);
-	});
 };
 
 Offlog.Github = {
