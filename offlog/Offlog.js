@@ -129,9 +129,8 @@ var Offlog = {
 		else document.getElementById("working").classList.add("inactive");
 	},
 
-	registerView: function(view, config_vars, init, die) {
-		if(typeof config_vars == "function") die = init, init = config_vars;
-		this.views[view] = new Offlog.View(view, config_vars, init, die);
+	registerView: function(view, init, die) {
+		this.views[view] = new Offlog.View(view, init, die);
 	},
 
 	renderView: function(view, data) {
@@ -154,33 +153,24 @@ var Offlog = {
  * @param {function} init Constructor function
  * @param {function} die  Destroy function
  */
-Offlog.View = function(name, storageData, init, die) {
+Offlog.View = function(name, init, die) {
 	this.name = name;
-	this.storageData = storageData;
 	this._init = init;
 	this._die = die || function() {};
 	this.events = [];
 };
 
 Offlog.View.prototype.render = function(data) {
-	data = data || {};
-	//get some configuration variables if any and send to view
-	if(this.storageData) {
-		var that = this;
-		Offlog.Storage.get(this.storageData, function(vars) {
 
-			//Merge the view supplied data with storage vars
-			for(var key in vars) data[key] = vars[key];
+	var that = this;
+	Offlog.Storage.get(undefined, function(vars) { //Expose all data to every view
 
-			console.log("View variables: ", vars);
+		//Merge the view supplied data with storage vars
+		if(data) for(var key in data) vars[key] = data[key];
 
-			that._init.call(that, that, data);
-			that.bindEvents();
-		})
-	} else {
-		this._init.call(this, this, data);
-		this.bindEvents();
-	}
+		that._init.call(that, that, vars);
+		that.bindEvents();
+	})
 };
 
 Offlog.View.prototype.die = function() {
@@ -227,6 +217,7 @@ Offlog.View.prototype.transition = function(transition, inOrOut, callback) {
 Offlog.Storage = {
 	api: chrome.storage.local,
 	_prefix: "offlog_",
+	store: {},
 
 	prefix: function(o, f) {
 		var that = this;
@@ -284,6 +275,7 @@ Offlog.Storage = {
 		}
 
 		var names = name; //this.addPrefix(name);
+
 		this.api.set(names, callback);
 	},
 
