@@ -44,7 +44,8 @@ Offlog.registerView("Home", ["blogs"], function(view, data) {
 		var that = this;
 		Offlog.confirm("Are you sure you want to delete this blog?", function() {
 			var id = that.parentNode.parentNode.getAttribute("data-blog");
-			Offlog.config("blog_context", function(blog_context) {
+			Offlog.config("blog_context", function(data) {
+				var blog_context = data.blog_context
 				if(blog_context == id) Offlog.config("rm", "blog_context");
 				blogs.removeItemById(id);
 				Offlog.config("blogs", blogs.toObject());

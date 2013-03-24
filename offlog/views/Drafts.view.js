@@ -51,7 +51,8 @@ Offlog.registerView("Drafts", ["drafts"], function(view, data) {
 		Offlog.confirm("Are you sure you want to delete this draft?", function() {
 			var id = parseInt(placeholder.getAttribute("data-article"));
 
-			Offlog.config("current_draft", function(current_draft) {
+			Offlog.config("current_draft", function(data) {
+				var current_draft = data.current_draft;
 				if(current_draft == id) Offlog.config("rm", "current_draft");
 				drafts.removeItemById(id);
 				Offlog.config("drafts", drafts.toObject());

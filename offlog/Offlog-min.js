@@ -4,7 +4,7 @@ var Offlog = {
 		main: document.getElementById("main-container")
 	},
 
-	defaultView: "Settings",
+	defaultView: "NewPost",
 
 	views: {},
 
@@ -153,7 +153,6 @@ var Offlog = {
  * @param {function} die  Destroy function
  */
 Offlog.View = function(name, config_vars, init, die) {
-	if(name == "Drafts") console.log("Creating View: ", name, config_vars, init, die);
 
 	this.name = name;
 	this.config_vars = config_vars;
@@ -170,6 +169,8 @@ Offlog.View.prototype.render = function(data) {
 		Offlog.config(this.config_vars, function(vars) {
 			//Merge the data with vars
 			for(var key in vars) data[key] = vars[key];
+
+			console.log("View variables: ", vars);
 
 			that._init.call(that, that, data);
 			that.bindEvents();
@@ -234,10 +235,7 @@ Offlog.Storage = {
 	},
 
 	"get": function(names, callback) {
-		return this.storage.get(names, function(vals) {
-			if(typeof names == "string") callback.call(this, vals[names]);
-			else callback.apply(this, arguments);
-		});
+		return this.storage.get(names, callback);
 	},
 
 	"delete": function(arr) {
@@ -261,7 +259,11 @@ Offlog.config = function(name, val) {
 	name = "config_" + name;
 
 	if(name && typeof val !== "function") return Offlog.Storage.set(name, val);
-	else return Offlog.Storage.get(name, val);
+	else return Offlog.Storage.get(name, function(data) {
+		var f = {};
+		for(var key in data) f[key.replace("config_", "")] = data[key];
+		val(f);
+	});
 };
 
 Offlog.Github = {
@@ -302,35 +304,39 @@ Offlog.Github = {
 		}
 	},
 
-	isIntegrated: function() {
-		return Offlog.config("gh_integration");
-	},
-
 	// Singleton Class for the github API
-	api: function() {
+	api: function(callback) {
 		if(!this.gh) {
-			if(this.isIntegrated())
-				return this.gh = new Github({
-					username: Offlog.config("gh_username"),
-					password: Base64.decode(Offlog.config("gh_password")),
-					auth: "basic"
-				});
-			else this.error(1);
-		} else return this.gh;
+			var that = this;
+			Offlog.config(["gh_integrated", "gh_username", "gh_password"], function(data) {
+				if(data.gh_integrated)
+					Offlog.gh = new Github({
+						username: data.gh_username,
+						password: Base64.decode(data.gh_password),
+						auth: "basic"
+					}), callback(Offlog.gh);
+				else that.error(1);
+			});
+		} else callback(this.gh);
 	},
 
 	getAuthorInformation: function(clbk) {
-		Offlog.Github.getUser(Offlog.config("gh_username"), function(user) {
-			user = user[0];
+		Offlog.config("gh_username", function(data) {
+			var username = data.username;
+			Offlog.Github.getUser(username, function(user) {
+				user = user[0];
 
-			Offlog.config("author", user);
+				Offlog.config("author", user);
 
-			clbk();
+				clbk();
+			});
 		});
 	},
 
 	getUser: function(username, callback) {
-		Offlog.Github.api().getUser().show(Offlog.config(username), Offlog.Github.callback(callback));
+		Offlog.Github.api(function(api) {
+			api.getUser().show(username, Offlog.Github.callback(callback));
+		})
 	}
 };
 
@@ -357,7 +363,6 @@ Offlog.Template = {
 			partials = (templateArr[1].length > 0 && templateArr[1][0] !== "") ? (function() {
 				var part = {};
 				templateArr[1].forEach(function(name) {
-					console.log("Partial name: ", name)
 					part[name] = Offlog.Template.templates[name][0];
 				});
 
@@ -551,11 +556,16 @@ Offlog.Blog.prototype.getTheme = function(theme) {
 };
 
 Offlog.Blog.prototype.save = function() {
-	var blogs = new Offlog.List(Offlog.config("blogs"));
-	blogs.addItem(this.blog)
-	Offlog.config("blogs", blogs.toObject());
+	// CHROME LOOK AT WHAT YOU MADE ME DO.
 
-	return blogs.id;
+	var that = this, id;
+	Offlog.config("blogs", function(data) {
+		var blogs = new Offlog.List(data.blogs);
+		id = blogs.addItem(that.blog)
+		Offlog.config("blogs", blogs.toObject());
+	});
+
+	return id;
 };
 
 /**
@@ -573,11 +583,15 @@ Offlog.Article = function(title, text) {
 };
 
 Offlog.Article.prototype.save = function() {
-	var drafts = new Offlog.List(Offlog.config("drafts"));
-	var item = drafts.addItem(this.article);
-	Offlog.config("drafts", drafts.toObject());
 
-	return item.id;
+	var that = this, id;
+	Offlog.config("drafts", function(data) {
+		var drafts = new Offlog.List(data.drafts);
+		id = drafts.addItem(that.article)
+		Offlog.config("drafts", drafts.toObject());
+	});
+
+	return id;
 };
 
 /**
@@ -585,7 +599,6 @@ Offlog.Article.prototype.save = function() {
  * @param {object} list And existing list
  */
 Offlog.List = function(list) {
-	console.log("List input: ", list);
 	if(list && typeof list == "object") {
 		// Existing list
 		this.list = list.list;
@@ -672,17 +685,17 @@ Offlog.containers.sidebar.addEventListener("mouseover", function() {
 
 Offlog.containers.sidebar.addEventListener("mouseout", function(event) {
 
-    function hasParent(child, parent) {
-    	for(var el = child.parentNode || false; el; el = (el || {}).parentNode) { //Pretty cool if I don't say so myself
-    		if(el == parent) return true;
-    	}
-    }
+ //    function hasParent(child, parent) {
+ //    	for(var el = child.parentNode || false; el; el = (el || {}).parentNode) { //Pretty cool if I don't say so myself
+ //    		if(el == parent) return true;
+ //    	}
+ //    }
 
-    //Prevent firing if child node
-	var e = event.toElement || event.relatedTarget; //Thanks SO
-	if (e == this || hasParent(e, this)) {
-        return;
-    }
+ //    //Prevent firing if child node
+	// var e = event.toElement || event.relatedTarget; //Thanks SO
+	// if (e == this || hasParent(e, this)) {
+ //        return;
+ //    }
 
 	hoverIntentStillHovering = false;
 
@@ -761,7 +774,8 @@ Offlog.registerView("Drafts", ["drafts"], function(view, data) {
 		Offlog.confirm("Are you sure you want to delete this draft?", function() {
 			var id = parseInt(placeholder.getAttribute("data-article"));
 
-			Offlog.config("current_draft", function(current_draft) {
+			Offlog.config("current_draft", function(data) {
+				var current_draft = data.current_draft;
 				if(current_draft == id) Offlog.config("rm", "current_draft");
 				drafts.removeItemById(id);
 				Offlog.config("drafts", drafts.toObject());
@@ -825,7 +839,8 @@ Offlog.registerView("Home", ["blogs"], function(view, data) {
 		var that = this;
 		Offlog.confirm("Are you sure you want to delete this blog?", function() {
 			var id = that.parentNode.parentNode.getAttribute("data-blog");
-			Offlog.config("blog_context", function(blog_context) {
+			Offlog.config("blog_context", function(data) {
+				var blog_context = data.blog_context
 				if(blog_context == id) Offlog.config("rm", "blog_context");
 				blogs.removeItemById(id);
 				Offlog.config("blogs", blogs.toObject());
@@ -942,7 +957,7 @@ Offlog.registerView("NewBlog", ["blogs", "blog_context"], function(view, data) {
 
 	Offlog.Template.render("new-blog", Offlog.containers.main, {
 		action: editMode ? "Update" : "New",
-		blog: (editMode && Offlog.config("blog_context")) ? blogs.getItemById(blog_context) : {},
+		blog: (editMode && blog_context) ? blogs.getItemById(blog_context) : {},
 		button: editMode ? "Update" : "Submit"
 	});
 
@@ -964,8 +979,8 @@ Offlog.registerView("NewBlog", ["blogs", "blog_context"], function(view, data) {
 		}
 
 		//Check to see if the root location is unique
-		var blogs = Offlog.config("blogs") || [];
-		for(var i = 0; i < blogs.length; i++) if(blogs[i].root_location == values["root_location"]) return new Offlog.Notification("error", "Root location not unique", "That root location is already in use on blog '" + blogs[i].title + "'.");
+		var blogsArr = blogs.list || [];
+		for(var i = 0; i < blogsArr.length; i++) if(blogsArr[i].root_location == values["root_location"]) return new Offlog.Notification("error", "Root location not unique", "That root location is already in use on blog '" + blogs[i].title + "'.");
 
 		if(!editMode) {
 			//Inputs sanitized
@@ -1094,35 +1109,36 @@ Offlog.registerView("Settings", ["author", "gh_integration"], function(view, dat
      Begin NewPost.view.js
 ********************************************** */
 
-Offlog.registerView("NewPost", ["blogs", "blog_context"], function(view, data) {
+Offlog.registerView("NewPost", ["blogs", "blog_context", "current_draft", "drafts"], function(view, data) {
 	var blogs = new Offlog.List(data.blogs),
-		blog_context = data.blog_context;
+		drafts = new Offlog.List(data.drafts),
+		blog_context = data.blog_context,
+		current_draft = data.current_draft;
 
 	Offlog.Template.render("new-post", Offlog.containers.main, {
 		"blog_context": function() {
-			var context = Offlog.config("blog_context");
 
-			if(context) {
-				return Offlog.config("blogs")[context - 1].title;
+			if(blog_context) {
+				return blogs.getItemById(blog_context).title;
 			} else {
 				return "No blog selected."
 			}
 		},
 
 		"has_many_blogs": function() {
-			if((Offlog.config("blogs") || []).length > 1) return true;
+			if((blogs || []).length > 1) return true;
 			else return false;
 		},
 
 		"draft_content": function() {
-			if(Offlog.config("current_draft")) {
-				return (new Offlog.List(Offlog.config("drafts"))).getItemById(Offlog.config("current_draft")).content;
+			if(current_draft) {
+				return drafts.getItemById(current_draft).content;
 			}
 		},
 
 		"draft_title": function() {
-			if(Offlog.config("current_draft")) {
-				return (new Offlog.List(Offlog.config("drafts"))).getItemById(Offlog.config("current_draft")).title;
+			if(current_draft) {
+				return draft.getItemById(current_draft).title;
 			}
 		}
 	});
@@ -1138,8 +1154,8 @@ Offlog.registerView("NewPost", ["blogs", "blog_context"], function(view, data) {
 		var title = document.getElementById("new-post-title").value,
 			content = document.getElementById("new-post-content").value;
 
-		Offlog.config("current_draft", function(current_draft) {
-			if(!current_draft) {
+		Offlog.config("current_draft", function(data) {
+			if(!data.current_draft) {
 				//create a new article instance
 				if(!title) return new Offlog.Notification("error", "No Title", "Please supply a title before saving");
 

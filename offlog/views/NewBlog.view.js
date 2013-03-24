@@ -6,7 +6,7 @@ Offlog.registerView("NewBlog", ["blogs", "blog_context"], function(view, data) {
 
 	Offlog.Template.render("new-blog", Offlog.containers.main, {
 		action: editMode ? "Update" : "New",
-		blog: (editMode && Offlog.config("blog_context")) ? blogs.getItemById(blog_context) : {},
+		blog: (editMode && blog_context) ? blogs.getItemById(blog_context) : {},
 		button: editMode ? "Update" : "Submit"
 	});
 
@@ -28,8 +28,8 @@ Offlog.registerView("NewBlog", ["blogs", "blog_context"], function(view, data) {
 		}
 
 		//Check to see if the root location is unique
-		var blogs = Offlog.config("blogs") || [];
-		for(var i = 0; i < blogs.length; i++) if(blogs[i].root_location == values["root_location"]) return new Offlog.Notification("error", "Root location not unique", "That root location is already in use on blog '" + blogs[i].title + "'.");
+		var blogsArr = blogs.list || [];
+		for(var i = 0; i < blogsArr.length; i++) if(blogsArr[i].root_location == values["root_location"]) return new Offlog.Notification("error", "Root location not unique", "That root location is already in use on blog '" + blogs[i].title + "'.");
 
 		if(!editMode) {
 			//Inputs sanitized

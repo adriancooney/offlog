@@ -1,32 +1,33 @@
-Offlog.registerView("NewPost", ["blogs", "blog_context"], function(view, data) {
+Offlog.registerView("NewPost", ["blogs", "blog_context", "current_draft", "drafts"], function(view, data) {
 	var blogs = new Offlog.List(data.blogs),
-		blog_context = data.blog_context;
+		drafts = new Offlog.List(data.drafts),
+		blog_context = data.blog_context,
+		current_draft = data.current_draft;
 
 	Offlog.Template.render("new-post", Offlog.containers.main, {
 		"blog_context": function() {
-			var context = Offlog.config("blog_context");
 
-			if(context) {
-				return Offlog.config("blogs")[context - 1].title;
+			if(blog_context) {
+				return blogs.getItemById(blog_context).title;
 			} else {
 				return "No blog selected."
 			}
 		},
 
 		"has_many_blogs": function() {
-			if((Offlog.config("blogs") || []).length > 1) return true;
+			if((blogs || []).length > 1) return true;
 			else return false;
 		},
 
 		"draft_content": function() {
-			if(Offlog.config("current_draft")) {
-				return (new Offlog.List(Offlog.config("drafts"))).getItemById(Offlog.config("current_draft")).content;
+			if(current_draft) {
+				return drafts.getItemById(current_draft).content;
 			}
 		},
 
 		"draft_title": function() {
-			if(Offlog.config("current_draft")) {
-				return (new Offlog.List(Offlog.config("drafts"))).getItemById(Offlog.config("current_draft")).title;
+			if(current_draft) {
+				return draft.getItemById(current_draft).title;
 			}
 		}
 	});
@@ -42,8 +43,8 @@ Offlog.registerView("NewPost", ["blogs", "blog_context"], function(view, data) {
 		var title = document.getElementById("new-post-title").value,
 			content = document.getElementById("new-post-content").value;
 
-		Offlog.config("current_draft", function(current_draft) {
-			if(!current_draft) {
+		Offlog.config("current_draft", function(data) {
+			if(!data.current_draft) {
 				//create a new article instance
 				if(!title) return new Offlog.Notification("error", "No Title", "Please supply a title before saving");
 
