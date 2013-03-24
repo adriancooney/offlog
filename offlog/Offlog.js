@@ -98,6 +98,8 @@ var Offlog = {
 		this.resize();
 
 		//Initilize some variables
+		Offlog.Storage.set("drafts", new Offlog.List);
+		Offlog.Storage.set("blogs", new Offlog.List);
 
 		//Render the default view
 		this.renderView(this.defaultView);
@@ -152,10 +154,9 @@ var Offlog = {
  * @param {function} init Constructor function
  * @param {function} die  Destroy function
  */
-Offlog.View = function(name, config_vars, init, die) {
-
+Offlog.View = function(name, storageData, init, die) {
 	this.name = name;
-	this.config_vars = config_vars;
+	this.storageData = storageData;
 	this._init = init;
 	this._die = die || function() {};
 	this.events = [];
@@ -163,11 +164,12 @@ Offlog.View = function(name, config_vars, init, die) {
 
 Offlog.View.prototype.render = function(data) {
 	data = data || {};
-	//get some configuration variables if any 
-	if(this.config_vars) {
+	//get some configuration variables if any and send to view
+	if(this.storageData) {
 		var that = this;
-		Offlog.config(this.config_vars, function(vars) {
-			//Merge the data with vars
+		Offlog.Storage.get(this.storageData, function(vars) {
+
+			//Merge the view supplied data with storage vars
 			for(var key in vars) data[key] = vars[key];
 
 			console.log("View variables: ", vars);
@@ -228,7 +230,7 @@ Offlog.Storage = {
 
 	prefix: function(o, f) {
 		var that = this;
-		if(o instanceof Array) o.map(function(v) { return f(v); });
+		if(o instanceof Array) o = o.map(function(v) { return f(v); });
 		else if(o instanceof Object) { var n = {}; for(var key in o) n[f(key)] = o[key]; o = n; }
 		else if(typeof o == "string") o = f(o); //Hrm, "" instanceof String == false
 
@@ -250,9 +252,19 @@ Offlog.Storage = {
 	},
 
 	"get": function(name, callback) {
-		var that = this;
-		this.api.get(that.addPrefix(name), function(data) {
-			callback(that.removePrefix(data));
+		var that = this,
+			names = name; //that.addPrefix(name);
+		this.api.get(names, function(data) {
+			var obj = data; //that.removePrefix(data);
+
+			//Loop through and run preprocessors
+			for(var key in obj) {
+				if(typeof obj[key] == "object" && obj[key].list) {
+					obj[key] = new Offlog.List(obj[key]);
+				}
+			}
+
+			callback(obj);
 		});
 	},
 
@@ -266,9 +278,17 @@ Offlog.Storage = {
 			name = c;
 		}
 
-		console.log(name);
+		//Loop over values
+		for(var key in name) {
+			if(name[key] instanceof Offlog.List) console.log("Setting list!");
+		}
 
-		this.api.set(this.addPrefix(name), callback);
+		var names = name; //this.addPrefix(name);
+		this.api.set(names, callback);
+	},
+
+	"remove": function(name, callback) {
+		this.api.remove(this.addPrefix(name));
 	}
 };
 
