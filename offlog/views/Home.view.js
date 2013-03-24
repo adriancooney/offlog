@@ -1,5 +1,5 @@
-Offlog.registerView("Home", ["blogs"], function(view, data) {
-	var blogs = new Offlog.List(data.blogs);
+Offlog.registerView("Home", function(view, data) {
+	var blogs = data.blogs;
 
 	Offlog.Template.render("home", Offlog.containers.main, {
 		blogs: blogs.list,
@@ -35,7 +35,7 @@ Offlog.registerView("Home", ["blogs"], function(view, data) {
 	bindToMany(document.getElementsByClassName("edit-blog-settings"), "click", function() {
 		var id = this.parentNode.parentNode.getAttribute("data-blog");
 
-		Offlog.config("blog_context", id);
+		Offlog.Storage.set("blog_context", id);
 
 		Offlog.renderView("NewBlog", {editMode: true})
 	});
@@ -44,11 +44,11 @@ Offlog.registerView("Home", ["blogs"], function(view, data) {
 		var that = this;
 		Offlog.confirm("Are you sure you want to delete this blog?", function() {
 			var id = that.parentNode.parentNode.getAttribute("data-blog");
-			Offlog.config("blog_context", function(data) {
+			Offlog.Storage.get("blog_context", function(data) {
 				var blog_context = data.blog_context
-				if(blog_context == id) Offlog.config("rm", "blog_context");
+				if(blog_context == id) Offlog.Storage.remove("blog_context");
 				blogs.removeItemById(id);
-				Offlog.config("blogs", blogs.toObject());
+				Offlog.Storage.set("blogs", blogs);
 
 				view.render();
 			});

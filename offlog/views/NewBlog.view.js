@@ -1,6 +1,6 @@
-Offlog.registerView("NewBlog", ["blogs", "blog_context"], function(view, data) {
+Offlog.registerView("NewBlog", function(view, data) {
 	var editMode = (data) ? data.editMode : false,
-		blogs = new Offlog.List(data.blogs),
+		blogs = data.blogs,
 		blog_context = data.blog_context;
 
 
@@ -40,12 +40,14 @@ Offlog.registerView("NewBlog", ["blogs", "blog_context"], function(view, data) {
 				description: values["description"]
 			})
 
-			var id = blog.save();
+			var id = blog.save(function(id) {
+
+				//Set it as the current blog
+				Offlog.Storage.set("blog_context", id);
+			});
 
 			new Offlog.Notification("success", "Successfully created blog", "Successfully created blog '" + values["name"] + "'");
 
-			//Set it as the current blog
-			Offlog.config("blog_context", id);
 		} else {
 			var blog = blogs.getItemById(blog_context);
 

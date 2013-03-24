@@ -1,4 +1,4 @@
-Offlog.registerView("Settings", ["author", "gh_integration"], function(view, data) {
+Offlog.registerView("Settings", function(view, data) {
 	var gh_integration = data.gh_integration,
 		author = data.author;
 
@@ -18,7 +18,7 @@ Offlog.registerView("Settings", ["author", "gh_integration"], function(view, dat
 
 	this.addEventListener(document.getElementById("github-deauthorize"), "click", function() {
 		// De authorize the user
-		Offlog.config("rm", ["gh_integration", "gh_password", "gh_username", "author"]);
+		Offlog.Storage.remove(["gh_integration", "gh_password", "gh_username", "author"]);
 
 		view.render();
 		new Offlog.Notification("success", "Github Deauthorized", "Github account deauthorized successfully.");
@@ -49,11 +49,11 @@ Offlog.registerView("Settings", ["author", "gh_integration"], function(view, dat
 						modal.die();
 
 						//And set the user information
-						Offlog.config("gh_integration", true);
-						Offlog.config("gh_username", username);
+						Offlog.Storage.set("gh_integration", true);
+						Offlog.Storage.set("gh_username", username);
 
 						// Not a fan of this but impossible to travel between sessions without it
-						Offlog.config("gh_password", Base64.encode(password));
+						Offlog.Storage.set("gh_password", Base64.encode(password));
 
 						//Set the user information
 						Offlog.Github.getAuthorInformation(function(user) {
@@ -78,7 +78,7 @@ Offlog.registerView("Settings", ["author", "gh_integration"], function(view, dat
 	Array.prototype.forEach.call(document.querySelectorAll("input[type=text], textarea"), function(input) {
 		input.addEventListener("keydown", function(key) {
 			if(key.which == 13) {
-				
+				console.log("Entered!");
 			}
 		})
 	});

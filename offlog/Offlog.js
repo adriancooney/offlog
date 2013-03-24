@@ -98,8 +98,8 @@ var Offlog = {
 		this.resize();
 
 		//Initilize some variables
-		Offlog.Storage.set("drafts", new Offlog.List);
-		Offlog.Storage.set("blogs", new Offlog.List);
+		Offlog.Storage.setIfNotExists("drafts", new Offlog.List);
+		Offlog.Storage.setIfNotExists("blogs", new Offlog.List);
 
 		//Render the default view
 		this.renderView(this.defaultView);
@@ -271,16 +271,25 @@ Offlog.Storage = {
 
 		//Loop over values
 		for(var key in name) {
-			if(name[key] instanceof Offlog.List) console.log("Setting list!");
+			if(name[key] instanceof Offlog.List) name[key] = name[key].toObject();
 		}
 
 		var names = name; //this.addPrefix(name);
+
+		console.log(names);
 
 		this.api.set(names, callback);
 	},
 
 	"remove": function(name, callback) {
-		this.api.remove(this.addPrefix(name));
+		this.api.remove(name);
+	},
+
+	setIfNotExists: function(name, value, callback) {
+		var that = this;
+		this.get(name, function(store) {
+			if(!store[name]) that.set(name, value, callback);
+		})
 	}
 };
 
@@ -326,7 +335,7 @@ Offlog.Github = {
 	api: function(callback) {
 		if(!this.gh) {
 			var that = this;
-			Offlog.config(["gh_integrated", "gh_username", "gh_password"], function(data) {
+			Offlog.Storage.get(["gh_integrated", "gh_username", "gh_password"], function(data) {
 				if(data.gh_integrated)
 					Offlog.gh = new Github({
 						username: data.gh_username,
@@ -339,12 +348,12 @@ Offlog.Github = {
 	},
 
 	getAuthorInformation: function(clbk) {
-		Offlog.config("gh_username", function(data) {
+		Offlog.Storage.get("gh_username", function(data) {
 			var username = data.username;
 			Offlog.Github.getUser(username, function(user) {
 				user = user[0];
 
-				Offlog.config("author", user);
+				Offlog.Storage.set("author", user);
 
 				clbk();
 			});
@@ -573,17 +582,13 @@ Offlog.Blog.prototype.getTheme = function(theme) {
 	return exampleTheme;
 };
 
-Offlog.Blog.prototype.save = function() {
-	// CHROME LOOK AT WHAT YOU MADE ME DO.
-
-	var that = this, id;
-	Offlog.config("blogs", function(data) {
-		var blogs = new Offlog.List(data.blogs);
-		id = blogs.addItem(that.blog)
-		Offlog.config("blogs", blogs.toObject());
+Offlog.Blog.prototype.save = function(callback) {
+	var that = this;
+	Offlog.Storage.get("blogs", function(data) {
+		id = data.blogs.addItem(that.blog)
+		Offlog.Storage.set("blogs", data.blogs);
+		callback(id.id);
 	});
-
-	return id;
 };
 
 /**
@@ -600,16 +605,14 @@ Offlog.Article = function(title, text) {
 	}
 };
 
-Offlog.Article.prototype.save = function() {
+Offlog.Article.prototype.save = function(callback) {
+	var that = this;
+	Offlog.Storage.get("drafts", function(data) {
+		id = data.drafts.addItem(that.article)
+		Offlog.Storage.set("drafts", data.drafts);
 
-	var that = this, id;
-	Offlog.config("drafts", function(data) {
-		var drafts = new Offlog.List(data.drafts);
-		id = drafts.addItem(that.article)
-		Offlog.config("drafts", drafts.toObject());
+		callback(id.id);
 	});
-
-	return id;
 };
 
 /**

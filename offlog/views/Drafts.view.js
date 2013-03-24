@@ -1,5 +1,5 @@
-Offlog.registerView("Drafts", ["drafts"], function(view, data) {
-	var drafts = new Offlog.List(data.drafts)
+Offlog.registerView("Drafts", function(view, data) {
+	var drafts = data.drafts;
 
 	Offlog.Template.render("drafts", Offlog.containers.main, {
 		drafts: drafts.list,
@@ -41,7 +41,7 @@ Offlog.registerView("Drafts", ["drafts"], function(view, data) {
 	}
 
 	this.addEventListener(document.getElementById("continue-editing-draft"), "click", function() {
-		Offlog.config("current_draft", parseInt(placeholder.getAttribute("data-article")));
+		Offlog.Storage.set("current_draft", parseInt(placeholder.getAttribute("data-article")));
 
 		Offlog.renderView("NewPost")
 	})
@@ -51,11 +51,11 @@ Offlog.registerView("Drafts", ["drafts"], function(view, data) {
 		Offlog.confirm("Are you sure you want to delete this draft?", function() {
 			var id = parseInt(placeholder.getAttribute("data-article"));
 
-			Offlog.config("current_draft", function(data) {
+			Offlog.Storage.get("current_draft", function(data) {
 				var current_draft = data.current_draft;
-				if(current_draft == id) Offlog.config("rm", "current_draft");
+				if(current_draft == id) Offlog.Storage.remove("current_draft");
 				drafts.removeItemById(id);
-				Offlog.config("drafts", drafts.toObject());
+				Offlog.Storage.set("drafts", drafts.toObject());
 
 				view.render();
 			});
