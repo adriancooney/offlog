@@ -4,7 +4,7 @@ var Offlog = {
 		main: document.getElementById("main-container")
 	},
 
-	defaultView: "NewPost",
+	defaultView: "Welcome",
 
 	views: {},
 
@@ -100,9 +100,27 @@ var Offlog = {
 		//Initilize some variables
 		Offlog.Storage.setIfNotExists("drafts", new Offlog.List);
 		Offlog.Storage.setIfNotExists("blogs", new Offlog.List);
+		Offlog.Storage.setIfNotExists("writing", {
+				fontSize: "16px",
+				lineHeight: "120%",
+				font: "monospace"
+			});
 
 		//Render the default view
-		this.renderView(this.defaultView);
+		//this.renderView(this.defaultView);
+		
+		//Check if the welcome has been shown, if not, show it
+		Offlog.Storage.get("shownWelcome", function(store) {
+			var sw = store.shownWelcome;
+
+			if(!sw) {
+				Offlog.renderView("Welcome");
+
+				Offlog.Storage.set("shownWelcome", true);
+			} else {
+				Offlog.renderView("Home");
+			}
+		})
 	},
 
 	confirm: function(msg, confrm, cancel) {
@@ -276,8 +294,6 @@ Offlog.Storage = {
 
 		var names = name; //this.addPrefix(name);
 
-		console.log(names);
-
 		this.api.set(names, callback);
 	},
 
@@ -286,9 +302,15 @@ Offlog.Storage = {
 	},
 
 	setIfNotExists: function(name, value, callback) {
+		console.log("Setting if not exists");
 		var that = this;
 		this.get(name, function(store) {
-			if(!store[name]) that.set(name, value, callback);
+			if(!store[name]) {
+				console.log("Does not exist");
+				that.set(name, value, callback);
+			} else {
+				console.log("Exists", name);
+			}
 		})
 	}
 };
@@ -578,6 +600,21 @@ Offlog.Blog.prototype.compile = function() {
 
 };
 
+Offlog.Blog.prototype.compilePage = function(page, data) {
+	switch( page ) {
+		case "index":
+			var page;
+
+			//Index takes articles in short form
+			console.log(this);
+		break;
+
+		case "article":
+
+		break;
+	}
+};
+
 Offlog.Blog.prototype.getTheme = function(theme) {
 	return exampleTheme;
 };
@@ -585,7 +622,7 @@ Offlog.Blog.prototype.getTheme = function(theme) {
 Offlog.Blog.prototype.save = function(callback) {
 	var that = this;
 	Offlog.Storage.get("blogs", function(data) {
-		id = data.blogs.addItem(that.blog)
+		var id = data.blogs.addItem(that.blog)
 		Offlog.Storage.set("blogs", data.blogs);
 		callback(id.id);
 	});
@@ -608,7 +645,7 @@ Offlog.Article = function(title, text) {
 Offlog.Article.prototype.save = function(callback) {
 	var that = this;
 	Offlog.Storage.get("drafts", function(data) {
-		id = data.drafts.addItem(that.article)
+		var id = data.drafts.addItem(that.article)
 		Offlog.Storage.set("drafts", data.drafts);
 
 		callback(id.id);
@@ -684,7 +721,6 @@ Array.prototype.forEach.call(document.querySelectorAll("nav li"), function(elem)
 		//Reset the hover intent
 		hoverIntentListening = false;
 
-		console.log(this.children[1].innerText.trim());
 		Offlog.sidebar.buttonHandlers[this.children[1].innerText.trim()].call(Offlog, elem);
 		if(!menuClick) setTimeout(Offlog.sidebar.close, 600);
 	});

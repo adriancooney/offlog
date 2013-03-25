@@ -13,7 +13,8 @@ Offlog.registerView("Settings", function(view, data) {
 		"author": author,
 		"integration_text": gh_integration ? isIntegrated : notIntegrated,
 		"integration_disabled": gh_integration ? "disabled" : "",
-		"integration_actions": gh_integration ? actionDeauthorize : actionIntegrate
+		"integration_actions": gh_integration ? actionDeauthorize : actionIntegrate,
+		"writing": data.writing
 	});
 
 	this.addEventListener(document.getElementById("github-deauthorize"), "click", function() {
@@ -77,8 +78,27 @@ Offlog.registerView("Settings", function(view, data) {
 
 	Array.prototype.forEach.call(document.querySelectorAll("input[type=text], textarea"), function(input) {
 		input.addEventListener("keydown", function(key) {
-			if(key.which == 13) {
-				console.log("Entered!");
+			console.log(key);
+			if(key.which == 13 || key.which == 9 && !key.shiftKey) {
+				if(key.which !== 9) key.preventDefault();
+
+				var input = this.getAttribute("name").split("-"),
+					that = this;
+
+				Offlog.Storage.get(input[0], function(data) {
+					var obj = data[input[0]] || {};
+
+					obj[input[1]] = that.value;
+
+					console.log(that.value)
+
+					var save = {};
+					save[input[0]] = obj;
+
+					Offlog.Storage.set(save);
+
+					new Offlog.Notification("success", "Information saved", "Information successfully saved.");
+				});
 			}
 		})
 	});

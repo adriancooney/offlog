@@ -45,7 +45,7 @@
 			<div class="blog-settings"></div>
 		</div>
 		<input type="text" placeholder="Post title.." value="{{draft_title}}" id="new-post-title"/>
-		<textarea id="new-post-content"/>{{draft_content}}</textarea>
+		<textarea id="new-post-content" style="font-size: {{writing.fontSize}}; font-family: {{writing.font}}; line-height: {{writing.lineHeight}}"/>{{draft_content}}</textarea>
 	</script>
 
 	<script type="text/template" data-id="home">
@@ -212,7 +212,7 @@
 					<div class="avatar"><i class="icon-user"></i></div>
 					<input type="text" placeholder="Name" name="author-name" value="{{author.name}}"/><br>
 					<input type="text" placeholder="Email" name="author-email" value="{{author.email}}"/>
-					<textarea placeholder="Bio" name="author-bio" value="{{author.bio}}"></textarea>
+					<textarea placeholder="Bio" name="author-bio">{{author.bio}}</textarea>
 				</form>
 			</div>
 			<div class="half">
@@ -227,9 +227,9 @@
 				</div>
 				<h3>Writing</h3>
 				<form id="author">
-					<label>Font Size</label><input type="text" value="16px" name="writing-name" style="width: 10%"/>
-					<label>Font Family</label><input type="text" value="Helvetica" name="writing-name" style="width: 20%"/>
-					<label>Line Height</label><input type="text" value="120%" name="writing-name" style="width: 10%"/><br>
+					<label>Font Size</label><input type="text" value="{{writing.fontSize}}" name="writing-fontSize" style="width: 10%"/>
+					<label>Font Family</label><input type="text" value="{{writing.font}}" name="writing-font" style="width: 20%"/>
+					<label>Line Height</label><input type="text" value="{{writing.lineHeight}}" name="writing-lineHeight" style="width: 10%"/><br>
 				</form>
 			</div>
 		</div>

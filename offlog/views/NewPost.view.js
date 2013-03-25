@@ -30,7 +30,9 @@ Offlog.registerView("NewPost", function(view, storage) {
 			if(current_draft) {
 				return drafts.getItemById(current_draft).title;
 			}
-		}
+		},
+
+		"writing": storage.writing
 	});
 
 	this.addEventListener(document.getElementById("post-new"), "click", function() {
