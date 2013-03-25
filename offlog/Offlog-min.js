@@ -639,7 +639,7 @@ Offlog.Article = function(title, text) {
 		content: text,
 		timestamp: new Date().toJSON(),
 		published: false
-	}
+	};
 };
 
 Offlog.Article.prototype.save = function(callback) {
