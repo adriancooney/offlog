@@ -574,19 +574,16 @@ Offlog.Filesystem = {
 /**
  * Offlog Blog class
  */
-Offlog.Blog = function(options) {
-	this.blog = (function(merge) {
-		var defaults = {
-			theme: "default",
-			articles: [],
-			timestamp: new Date().toJSON()
-		}, required = ["title", "root_location"];
+Offlog.Blog = function(data) {
+	var defaults = {
+		theme: "default",
+		articles: [],
+		timestamp: new Date().toJSON()
+	};
 
-		required.forEach(function(req) { if(!merge[req]) { throw new Error(req + " not supplied to new blog."); }});
-		for(var key in defaults) if(!merge[key]) merge[key] = defaults[key];
+	for(var key in defaults) if(!data[key]) data[key] = defaults[key];
 
-		return merge;
-	})(options);
+	this.blog = data;
 };
 
 Offlog.Blog.prototype.compile = function() {
