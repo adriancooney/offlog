@@ -1,4 +1,24 @@
 Offlog.registerView("Home", function(view, data) {
+
+	/** Publishing console **/
+	Offlog.Console = {
+		append: function(data) {
+			var console = document.getElementById("console");
+
+			var p = document.createElement("p");
+			p.innerText = data;
+
+			console.appendChild(p);
+
+			//http://stackoverflow.com/questions/270612/scroll-to-bottom-of-div
+			console.scrollTop = console.scrollHeight;
+		},
+
+		clear: function() {
+			document.getElementById("console").innerHTML = "";
+		}
+	};
+
 	var blogs = data.blogs;
 
 	Offlog.Template.render("home", Offlog.containers.main, {
