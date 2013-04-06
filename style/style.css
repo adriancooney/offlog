@@ -1227,6 +1227,12 @@ body {
   font-size: 18px;
   margin-top: 4px;
 }
+#main-container[data-template="new-post"] .post-settings {
+  height: 50px;
+  position: absolute;
+  width: 100%;
+  background: #f00;
+}
 #main-container[data-template="settings"] .github-button {
   background: #fafafa;
   /* Old browsers */
@@ -1472,73 +1478,73 @@ body {
     color: #fff;
   }
 }
-#main-container[data-template="drafts"] .preview {
+#main-container[data-template="articles"] .preview {
   background: #fff;
   height: 100%;
   overflow-y: scroll;
 }
-#main-container[data-template="drafts"] .drafts-list li {
+#main-container[data-template="articles"] .drafts-list li {
   -webkit-transition: all 300ms;
   margin: 8px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.3);
   padding: 6px 0;
   cursor: pointer;
 }
-#main-container[data-template="drafts"] .drafts-list li .draft-icon {
+#main-container[data-template="articles"] .drafts-list li .draft-icon {
   float: left;
   font-size: 46px;
   width: 40px;
   margin-right: 8px;
   color: rgba(0, 0, 0, 0.2);
 }
-#main-container[data-template="drafts"] .drafts-list li .arrow {
+#main-container[data-template="articles"] .drafts-list li .arrow {
   float: right;
   font-size: 20px;
   margin-top: 9px;
   color: rgba(0, 0, 0, 0.4);
 }
-#main-container[data-template="drafts"] .drafts-list li h4 {
+#main-container[data-template="articles"] .drafts-list li h4 {
   font-size: 24px;
   color: rgba(0, 0, 0, 0.6);
   -webkit-transition: color 300ms;
 }
-#main-container[data-template="drafts"] .drafts-list li h5 {
+#main-container[data-template="articles"] .drafts-list li h5 {
   font-size: 14px;
   margin: 4px;
   color: rgba(0, 0, 0, 0.3);
   -webkit-transition: color 300ms;
 }
-#main-container[data-template="drafts"] .drafts-list li h5 span {
+#main-container[data-template="articles"] .drafts-list li h5 span {
   font-weight: bold;
 }
-#main-container[data-template="drafts"] .drafts-list li:last-child {
+#main-container[data-template="articles"] .drafts-list li:last-child {
   border-bottom: none;
 }
-#main-container[data-template="drafts"] .drafts-list li:hover h4 {
+#main-container[data-template="articles"] .drafts-list li:hover h4 {
   color: #000000;
 }
-#main-container[data-template="drafts"] .drafts-list li:hover h5 {
+#main-container[data-template="articles"] .drafts-list li:hover h5 {
   color: rgba(0, 0, 0, 0.6);
 }
-#main-container[data-template="drafts"] .drafts-list .active h4 {
+#main-container[data-template="articles"] .drafts-list .active h4 {
   color: #000000;
   font-weight: 600;
 }
-#main-container[data-template="drafts"] .drafts-list .active h5 {
+#main-container[data-template="articles"] .drafts-list .active h5 {
   color: rgba(0, 0, 0, 0.6);
 }
-#main-container[data-template="drafts"] .drafts-list .active .draft-icon {
+#main-container[data-template="articles"] .drafts-list .active .draft-icon {
   color: rgba(0, 0, 0, 0.35);
 }
-#main-container[data-template="drafts"] .drafts-list .active .arrow {
+#main-container[data-template="articles"] .drafts-list .active .arrow {
   margin-right: -4px;
 }
-#main-container[data-template="drafts"] #toolbar {
+#main-container[data-template="articles"] #toolbar {
   width: 100%;
   background: #272731;
   height: 38px;
 }
-#main-container[data-template="drafts"] #toolbar button {
+#main-container[data-template="articles"] #toolbar button {
   float: right;
   font-size: 14px;
   width: auto;
@@ -1550,22 +1556,22 @@ body {
   margin-right: 0;
   padding-right: 8px;
 }
-#main-container[data-template="drafts"] #toolbar #continue-editing-draft {
+#main-container[data-template="articles"] #toolbar #continue-editing-draft {
   border-right: none;
   margin-left: 0;
 }
-#main-container[data-template="drafts"] #toolbar h4 {
+#main-container[data-template="articles"] #toolbar h4 {
   color: rgba(255, 255, 255, 0.8);
   padding: 10px;
   font-size: 18px;
 }
-#main-container[data-template="drafts"] #toolbar.inactive button {
+#main-container[data-template="articles"] #toolbar.inactive button {
   display: none;
 }
-#main-container[data-template="drafts"] .placeholder {
+#main-container[data-template="articles"] .placeholder {
   width: 100%;
 }
-#main-container[data-template="drafts"] .placeholder h1 {
+#main-container[data-template="articles"] .placeholder h1 {
   font-size: 32px;
   margin: 18px;
   padding: 6px 0;

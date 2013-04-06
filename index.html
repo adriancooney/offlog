@@ -37,12 +37,10 @@
 				<i id="post-save" class="icon-save" alt="Save post as draft"></i>
 				<i id="post-publish" class="icon-signout" alt="Publish post"></i>
 			</div>
-			<h3><i class="icon-book type" alt="Current blog context"></i> {{blog_context}} 
-				{{#has_many_blogs}}
-					<i class="icon-caret-down"></i>
-				{{/has_many_blogs}}
-			</h3>
-			<div class="blog-settings"></div>
+			<h3><i class="icon-book type" alt="Current blog context"></i> New Post</h3>
+			<div class="post-settings">
+				<h4>Hello world</h4>
+			</div>
 		</div>
 		<input type="text" placeholder="Post title.." value="{{draft_title}}" id="new-post-title"/>
 		<textarea id="new-post-content" style="font-size: {{writing.fontSize}}; font-family: {{writing.font}}; line-height: {{writing.lineHeight}}"/>{{draft_content}}</textarea>
@@ -112,9 +110,9 @@
 		</aside>
 	</script>
 
-	<script type="text/template" data-id="drafts">
+	<script type="text/template" data-id="articles">
 		<div class="blog-bar">
-			<h3><i class="icon-inbox type"></i> Drafts</h3>
+			<h3><i class="icon-inbox type"></i> Articles</h3>
 		</div>
 		<div class="row columns">
 			<div class="half">
@@ -133,8 +131,8 @@
 			</div>
 			<div class="half preview">
 				<div id="toolbar" class="inactive">
-					<button id="continue-editing-draft"><i class="icon-pencil"></i> Continue Editing</button>
-					<button id="delete-draft"><i class="icon-trash"></i> Delete</button>
+					<button id="continue-editing-article"><i class="icon-pencil"></i> Continue Editing</button>
+					<button id="delete-article"><i class="icon-trash"></i> Delete</button>
 					<h4>Preview</h4>
 				</div>
 				<div class="placeholder"></div>
@@ -244,7 +242,7 @@
 			<li><i class="icon-cog"></i> <span>Settings</span></li>
 			<li><i class="icon-medkit"></i> <span>Help</span></li>
 			<li class="break"><i class="icon-file-alt"></i> <span>New Post</span></li>
-			<li><i class="icon-inbox"></i> <span>View Drafts</span></li>
+			<li><i class="icon-inbox"></i> <span>Articles</span></li>
 			<li><i class="icon-tint"></i> <span>Edit Theme</span></li>
 		</nav>
 		<div class="logo">
@@ -260,7 +258,7 @@
 
 <script src="lib/markdown.js"></script>
 <script src="lib/humane.js"></script>
-<script src="lib/humane.js"></script>
+<script src="lib/keymaster.min.js"></script>
 
 <!-- Zip.js -->
 <script src="lib/zip.js/WebContent/zip.js"></script>

@@ -4,7 +4,7 @@ var Offlog = {
 		main: document.getElementById("main-container")
 	},
 
-	defaultView: "Welcome",
+	defaultView: "NewPost",
 
 	views: {},
 
@@ -47,8 +47,8 @@ var Offlog = {
 				Offlog.renderView("EditTheme");
 			},
 
-			"View Drafts": function() {
-				Offlog.renderView("Drafts");
+			"Articles": function() {
+				Offlog.renderView("Articles");
 			},
 		},
 
@@ -118,7 +118,7 @@ var Offlog = {
 
 				Offlog.Storage.set("shownWelcome", true);
 			} else {
-				Offlog.renderView("Home");
+				Offlog.renderView(Offlog.defaultView);
 			}
 		})
 	},
@@ -198,6 +198,12 @@ Offlog.containers.sidebar.addEventListener("mouseout", function(event) {
 	//Close it anyway
 	if(!menuClick) Offlog.sidebar.close();
 });
+
+//Keyboard shortcut, brought ot you by the beautfiul keymaster
+key("command+h, ctrl+h", function() { Offlog.renderView("Home"); });
+key("command+1, ctrl+1", function() { Offlog.renderView("NewPost"); });
+key("command+2, ctrl+2", function() { Offlog.renderView("Articles"); });
+key("command+3, ctrl+3", function() { Offlog.renderView("EditTheme"); });
 
 /**
  * Development
@@ -781,13 +787,13 @@ Offlog.registerView("Help", function() {
 });
 
 /* **********************************************
-     Begin Drafts.view.js
+     Begin Articles.view.js
 ********************************************** */
 
-Offlog.registerView("Drafts", function(view, data) {
+Offlog.registerView("Articles", function(view, data) {
 	var drafts = data.drafts;
 
-	Offlog.Template.render("drafts", Offlog.containers.main, {
+	Offlog.Template.render("articles", Offlog.containers.main, {
 		drafts: drafts.list,
 
 		"drafts_empty": function() {
@@ -802,7 +808,7 @@ Offlog.registerView("Drafts", function(view, data) {
 		}
 	});
 
-	var draftsList = document.querySelectorAll(".drafts-list li"),
+	var draftsList = document.querySelectorAll(".articles-list li"),
 		toolbar = document.getElementById("toolbar"),
 		placeholder = document.querySelectorAll(".placeholder")[0];
 
@@ -814,12 +820,11 @@ Offlog.registerView("Drafts", function(view, data) {
 		});
 	});
 
-	function displayDraft(draft) {
+	function displayArticle(article) {
+		var title = "<h1>" + article.title + "</h1>",
+			content = markdown.toHTML(article.content);
 
-		var title = "<h1>" + draft.title + "</h1>",
-			content = markdown.toHTML(draft.content);
-
-		placeholder.setAttribute("data-article", draft.id);
+		placeholder.setAttribute("data-article", article.id);
 
 		toolbar.classList.remove("inactive");
 
@@ -832,9 +837,9 @@ Offlog.registerView("Drafts", function(view, data) {
 		Offlog.renderView("NewPost")
 	})
 
-	this.addEventListener(document.getElementById("delete-draft"), "click", function() {
+	this.addEventListener(document.getElementById("delete-article"), "click", function() {
 
-		Offlog.confirm("Are you sure you want to delete this draft?", function() {
+		Offlog.confirm("Are you sure you want to delete this article?", function() {
 			var id = parseInt(placeholder.getAttribute("data-article"));
 
 			Offlog.Storage.get("current_draft", function(data) {

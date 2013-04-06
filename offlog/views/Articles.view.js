@@ -1,7 +1,7 @@
-Offlog.registerView("Drafts", function(view, data) {
+Offlog.registerView("Articles", function(view, data) {
 	var drafts = data.drafts;
 
-	Offlog.Template.render("drafts", Offlog.containers.main, {
+	Offlog.Template.render("articles", Offlog.containers.main, {
 		drafts: drafts.list,
 
 		"drafts_empty": function() {
@@ -16,7 +16,7 @@ Offlog.registerView("Drafts", function(view, data) {
 		}
 	});
 
-	var draftsList = document.querySelectorAll(".drafts-list li"),
+	var draftsList = document.querySelectorAll(".articles-list li"),
 		toolbar = document.getElementById("toolbar"),
 		placeholder = document.querySelectorAll(".placeholder")[0];
 
@@ -28,12 +28,11 @@ Offlog.registerView("Drafts", function(view, data) {
 		});
 	});
 
-	function displayDraft(draft) {
+	function displayArticle(article) {
+		var title = "<h1>" + article.title + "</h1>",
+			content = markdown.toHTML(article.content);
 
-		var title = "<h1>" + draft.title + "</h1>",
-			content = markdown.toHTML(draft.content);
-
-		placeholder.setAttribute("data-article", draft.id);
+		placeholder.setAttribute("data-article", article.id);
 
 		toolbar.classList.remove("inactive");
 
@@ -46,9 +45,9 @@ Offlog.registerView("Drafts", function(view, data) {
 		Offlog.renderView("NewPost")
 	})
 
-	this.addEventListener(document.getElementById("delete-draft"), "click", function() {
+	this.addEventListener(document.getElementById("delete-article"), "click", function() {
 
-		Offlog.confirm("Are you sure you want to delete this draft?", function() {
+		Offlog.confirm("Are you sure you want to delete this article?", function() {
 			var id = parseInt(placeholder.getAttribute("data-article"));
 
 			Offlog.Storage.get("current_draft", function(data) {

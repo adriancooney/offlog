@@ -4,7 +4,7 @@ var Offlog = {
 		main: document.getElementById("main-container")
 	},
 
-	defaultView: "Welcome",
+	defaultView: "NewPost",
 
 	views: {},
 
@@ -47,8 +47,8 @@ var Offlog = {
 				Offlog.renderView("EditTheme");
 			},
 
-			"View Drafts": function() {
-				Offlog.renderView("Drafts");
+			"Articles": function() {
+				Offlog.renderView("Articles");
 			},
 		},
 
@@ -118,7 +118,7 @@ var Offlog = {
 
 				Offlog.Storage.set("shownWelcome", true);
 			} else {
-				Offlog.renderView("Home");
+				Offlog.renderView(Offlog.defaultView);
 			}
 		})
 	},
@@ -198,6 +198,12 @@ Offlog.containers.sidebar.addEventListener("mouseout", function(event) {
 	//Close it anyway
 	if(!menuClick) Offlog.sidebar.close();
 });
+
+//Keyboard shortcut, brought ot you by the beautfiul keymaster
+key("command+h, ctrl+h", function() { Offlog.renderView("Home"); });
+key("command+1, ctrl+1", function() { Offlog.renderView("NewPost"); });
+key("command+2, ctrl+2", function() { Offlog.renderView("Articles"); });
+key("command+3, ctrl+3", function() { Offlog.renderView("EditTheme"); });
 
 /**
  * Development
